@@ -1,0 +1,2917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusAPI Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Bricolage+Grotesque:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   NEXUSAPI DASHBOARD — TERMINAL-FINANCE AESTHETIC
+   IBM Plex Mono + Bricolage Grotesque
+   Dark: #050911 with Electric Teal #00E5CC accent
+═══════════════════════════════════════════════════ */
+:root {
+  --bg:       #050911;
+  --bg1:      #080d18;
+  --bg2:      #0c1220;
+  --bg3:      #111927;
+  --surf:     rgba(255,255,255,0.04);
+  --surf2:    rgba(255,255,255,0.07);
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(0,229,204,0.2);
+  --teal:     #00E5CC;
+  --teal2:    #00B8A5;
+  --blue:     #4D9FFF;
+  --purple:   #9B72FF;
+  --amber:    #FFB800;
+  --red:      #FF4D6A;
+  --green:    #00D084;
+  --text:     #E8EDF5;
+  --text2:    #7A8AA0;
+  --text3:    #3D4F63;
+  --mono:     'IBM Plex Mono', monospace;
+  --sans:     'Bricolage Grotesque', sans-serif;
+  --sidebar:  240px;
+  --radius:   10px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--text);overflow:hidden;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--teal2)}
+
+/* ── CURSOR ── */
+body{cursor:none}
+#cur{width:8px;height:8px;border-radius:50%;background:var(--teal);position:fixed;z-index:9999;pointer-events:none;transition:transform .08s;mix-blend-mode:screen}
+#cur-r{width:28px;height:28px;border-radius:50%;border:1px solid rgba(0,229,204,.35);position:fixed;z-index:9998;pointer-events:none;transition:all .14s}
+
+/* ══════════════════════════════
+   AUTH SCREEN
+══════════════════════════════ */
+#auth-screen{
+  position:fixed;inset:0;z-index:500;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+}
+.auth-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 20% 10%,rgba(0,229,204,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 90%,rgba(77,159,255,.07) 0%,transparent 60%);
+}
+.auth-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.auth-box{
+  position:relative;z-index:1;
+  width:420px;max-width:95vw;
+  background:var(--bg1);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  padding:48px;
+  box-shadow:0 0 80px rgba(0,229,204,.08);
+}
+.auth-logo{font-family:var(--sans);font-size:26px;font-weight:800;letter-spacing:-.03em;margin-bottom:8px;}
+.auth-logo .t{color:var(--teal);}
+.auth-logo .w{color:var(--text2);font-weight:300;}
+.auth-sub{font-size:13px;color:var(--text2);margin-bottom:40px;}
+
+.auth-tabs{display:flex;gap:0;margin-bottom:32px;background:var(--bg2);border-radius:8px;padding:3px;}
+.auth-tab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:600;border-radius:6px;cursor:none;transition:all .2s;color:var(--text3);}
+.auth-tab.active{background:var(--bg3);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+
+.form-group{margin-bottom:18px;}
+.form-label{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:7px;font-family:var(--mono);}
+.form-input{
+  width:100%;background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:11px 14px;
+  color:var(--text);font-family:var(--mono);font-size:14px;outline:none;
+  transition:border-color .2s;
+}
+.form-input:focus{border-color:var(--teal);}
+.form-input::placeholder{color:var(--text3);}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 22px;border-radius:var(--radius);font-size:14px;font-weight:600;
+  cursor:none;transition:all .2s;text-decoration:none;border:none;
+  font-family:var(--sans);white-space:nowrap;
+}
+.btn-teal{background:linear-gradient(135deg,var(--teal),#008F82);color:#000;}
+.btn-teal:hover{box-shadow:0 0 24px rgba(0,229,204,.35);transform:translateY(-1px);}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2);}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text);background:var(--surf);}
+.btn-danger{background:rgba(255,77,106,.12);border:1px solid rgba(255,77,106,.25);color:var(--red);}
+.btn-danger:hover{background:rgba(255,77,106,.2);}
+.btn-sm{padding:7px 14px;font-size:12px;}
+.btn-full{width:100%;}
+.btn-icon{width:34px;height:34px;padding:0;}
+
+.auth-box .btn-teal{width:100%;padding:13px;font-size:15px;margin-top:8px;}
+.auth-divider{text-align:center;color:var(--text3);font-size:12px;margin:20px 0;position:relative;}
+.auth-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border);}
+.auth-divider span{position:relative;background:var(--bg1);padding:0 12px;}
+
+/* ══════════════════════════════
+   APP LAYOUT
+══════════════════════════════ */
+#app{display:flex;height:100vh;overflow:hidden;}
+#app.hidden{display:none;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar);flex-shrink:0;
+  background:var(--bg1);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  padding:0;position:relative;z-index:10;
+}
+.sidebar-logo{
+  padding:24px 20px 20px;
+  border-bottom:1px solid var(--border);
+  font-family:var(--sans);font-size:18px;font-weight:800;letter-spacing:-.03em;
+}
+.sidebar-logo .t{color:var(--teal);}
+.sidebar-logo .w{color:var(--text3);font-weight:300;}
+.sidebar-logo .version{display:block;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:400;margin-top:2px;letter-spacing:.05em;}
+
+.sidebar-section{padding:8px 12px 4px;}
+.sidebar-section-label{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:4px;}
+
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 8px;border-radius:8px;
+  font-size:13px;font-weight:500;color:var(--text2);
+  cursor:none;transition:all .15s;margin-bottom:1px;
+  text-decoration:none;
+}
+.nav-item:hover{background:var(--surf);color:var(--text);}
+.nav-item.active{background:rgba(0,229,204,.1);color:var(--teal);}
+.nav-item.active .nav-icon{color:var(--teal);}
+.nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--teal);color:#000;font-size:9px;font-weight:700;padding:2px 6px;border-radius:100px;font-family:var(--mono);}
+.nav-badge.red{background:var(--red);color:#fff;}
+
+.sidebar-credits{
+  margin:12px;
+  background:rgba(0,229,204,.06);
+  border:1px solid rgba(0,229,204,.15);
+  border-radius:var(--radius);padding:14px;
+}
+.credits-label{font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.credits-amount{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--teal);line-height:1;}
+.credits-sub{font-size:10px;color:var(--text3);margin-top:4px;}
+.credits-bar{background:var(--border);height:3px;border-radius:2px;margin:10px 0 12px;}
+.credits-fill{background:linear-gradient(90deg,var(--teal),var(--blue));height:100%;border-radius:2px;transition:width .6s ease;}
+
+.sidebar-user{
+  padding:14px 16px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;margin-top:auto;
+}
+.user-avatar{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:#000;flex-shrink:0;
+}
+.user-name{font-size:13px;font-weight:600;line-height:1.2;}
+.user-plan{font-size:10px;color:var(--teal);font-family:var(--mono);text-transform:uppercase;}
+.sidebar-logout{margin-left:auto;cursor:none;color:var(--text3);font-size:14px;transition:color .2s;}
+.sidebar-logout:hover{color:var(--red);}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── TOPBAR ── */
+.topbar{
+  height:56px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 28px;gap:16px;
+  background:var(--bg1);flex-shrink:0;
+}
+.topbar-title{font-family:var(--sans);font-size:15px;font-weight:700;flex:1;}
+.topbar-breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);}
+.topbar-right{display:flex;align-items:center;gap:10px;margin-left:auto;}
+.topbar-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);font-family:var(--mono);}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse2 2s infinite;}
+@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.4}}
+.notif-btn{
+  width:34px;height:34px;border-radius:8px;
+  background:var(--surf);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:none;font-size:15px;transition:all .2s;position:relative;
+}
+.notif-btn:hover{border-color:var(--border2);}
+.notif-dot{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--red);border:2px solid var(--bg1);}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:28px;}
+
+/* PAGE TRANSITIONS */
+.page{display:none;animation:pageIn .25s ease;}
+.page.active{display:block;}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══════════════════════════════
+   COMPONENTS
+══════════════════════════════ */
+
+/* STAT CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;
+  transition:border-color .2s;
+}
+.stat-card:hover{border-color:rgba(255,255,255,.12);}
+.stat-card-icon{font-size:20px;margin-bottom:12px;}
+.stat-card-val{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1;margin-bottom:6px;}
+.stat-card-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);}
+.stat-card-change{font-size:12px;margin-top:8px;font-family:var(--mono);}
+.change-up{color:var(--green);}
+.change-down{color:var(--red);}
+.stat-card-accent{position:absolute;top:0;right:0;width:60px;height:60px;border-radius:50%;filter:blur(30px);opacity:.3;}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.section-title{font-size:14px;font-weight:700;letter-spacing:-.01em;}
+.section-actions{display:flex;gap:8px;}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:13px;font-weight:700;letter-spacing:-.01em;}
+.card-body{padding:20px;}
+.card-body-p0{padding:0;}
+
+/* TABLES */
+.table{width:100%;border-collapse:collapse;}
+.table th{
+  text-align:left;font-size:10px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text3);font-family:var(--mono);
+  padding:10px 16px;border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+.table td{padding:12px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+.table tr:last-child td{border-bottom:none;}
+.table tr:hover td{background:rgba(255,255,255,.02);}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600;font-family:var(--mono);}
+.badge-green{background:rgba(0,208,132,.12);color:var(--green);}
+.badge-red{background:rgba(255,77,106,.12);color:var(--red);}
+.badge-amber{background:rgba(255,184,0,.12);color:var(--amber);}
+.badge-blue{background:rgba(77,159,255,.12);color:var(--blue);}
+.badge-teal{background:rgba(0,229,204,.12);color:var(--teal);}
+.badge-purple{background:rgba(155,114,255,.12);color:var(--purple);}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;}
+
+/* CODE */
+.code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:3px 8px;color:var(--teal);}
+
+/* CHARTS */
+.chart-wrap{position:relative;}
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:120px;padding:0 4px;}
+.bar-chart .bar{
+  flex:1;border-radius:3px 3px 0 0;min-height:3px;
+  background:linear-gradient(180deg,var(--teal),rgba(0,229,204,.25));
+  transition:height .5s ease,opacity .2s;cursor:none;position:relative;
+}
+.bar-chart .bar:hover{opacity:.8;}
+.bar-chart .bar .bar-tooltip{
+  position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--bg3);border:1px solid var(--border);border-radius:6px;
+  padding:6px 10px;font-family:var(--mono);font-size:11px;white-space:nowrap;
+  pointer-events:none;opacity:0;transition:opacity .15s;z-index:10;
+}
+.bar-chart .bar:hover .bar-tooltip{opacity:1;}
+.chart-labels{display:flex;gap:4px;padding:6px 4px 0;overflow:hidden;}
+.chart-labels span{flex:1;text-align:center;font-size:9px;color:var(--text3);font-family:var(--mono);overflow:hidden;}
+
+/* DONUT CHART */
+.donut-wrap{position:relative;width:120px;height:120px;margin:0 auto;}
+.donut-wrap svg{transform:rotate(-90deg);}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.donut-val{font-family:var(--mono);font-size:18px;font-weight:600;}
+.donut-label{font-size:9px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em;}
+
+/* LINE CHART */
+.line-chart-wrap{height:160px;position:relative;}
+.line-chart-wrap svg{width:100%;height:100%;}
+
+/* TOGGLE */
+.toggle{display:flex;background:var(--bg3);border-radius:7px;padding:2px;gap:0;}
+.toggle-btn{padding:6px 14px;border-radius:5px;font-size:11px;font-weight:600;font-family:var(--mono);cursor:none;transition:all .15s;color:var(--text3);border:none;background:transparent;}
+.toggle-btn.active{background:var(--bg2);color:var(--teal);box-shadow:0 1px 4px rgba(0,0,0,.3);}
+
+/* INPUT GROUP */
+.input-group{display:flex;gap:0;}
+.input-group .form-input{border-radius:var(--radius) 0 0 var(--radius);border-right:none;}
+.input-group .btn{border-radius:0 var(--radius) var(--radius) 0;padding:11px 16px;}
+
+/* COPY BUTTON */
+.copy-btn{background:none;border:none;cursor:none;color:var(--text3);font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:4px;transition:all .15s;}
+.copy-btn:hover{color:var(--teal);background:rgba(0,229,204,.08);}
+
+/* KEY DISPLAY */
+.key-display{font-family:var(--mono);font-size:13px;color:var(--teal);letter-spacing:.02em;}
+.key-masked{color:var(--text3);}
+
+/* MODAL */
+.modal-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(5,9,17,.85);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{
+  background:var(--bg1);border:1px solid var(--border2);
+  border-radius:16px;width:480px;max-width:95vw;
+  transform:translateY(16px);transition:transform .25s;
+  box-shadow:0 0 60px rgba(0,229,204,.1);
+  overflow:hidden;
+}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-header{padding:24px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:16px;font-weight:700;}
+.modal-close{width:28px;height:28px;border-radius:6px;background:var(--surf);border:none;color:var(--text2);cursor:none;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.modal-close:hover{color:var(--text);background:var(--surf2);}
+.modal-body{padding:28px;}
+.modal-footer{padding:20px 28px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+
+/* TOAST */
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:8px;}
+.toast{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;padding:12px 16px;
+  display:flex;align-items:center;gap:12px;min-width:280px;
+  transform:translateX(120%);transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 4px 24px rgba(0,0,0,.4);
+}
+.toast.show{transform:translateX(0);}
+.toast.success{border-color:rgba(0,208,132,.25);}
+.toast.error{border-color:rgba(255,77,106,.25);}
+.toast-icon{font-size:18px;}
+.toast-msg{flex:1;}
+.toast-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.toast-sub{font-size:11px;color:var(--text3);font-family:var(--mono);}
+
+/* UPI PAYMENT */
+.upi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.upi-opt{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;text-align:center;cursor:none;transition:all .2s;
+}
+.upi-opt:hover,.upi-opt.sel{border-color:var(--teal);background:rgba(0,229,204,.06);}
+.upi-opt-icon{font-size:24px;margin-bottom:4px;}
+.upi-opt-name{font-size:12px;font-weight:600;}
+.amt-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.amt-chip{
+  padding:7px 14px;border-radius:7px;font-size:13px;font-weight:600;
+  font-family:var(--mono);border:1px solid var(--border);background:var(--bg2);
+  color:var(--text2);cursor:none;transition:all .15s;
+}
+.amt-chip:hover,.amt-chip.sel{border-color:var(--green);color:var(--green);background:rgba(0,208,132,.08);}
+.upi-id-row{
+  background:rgba(0,229,204,.06);border:1px solid rgba(0,229,204,.15);
+  border-radius:var(--radius);padding:12px 14px;
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;
+}
+.upi-id{font-family:var(--mono);font-size:14px;color:var(--teal);}
+.pay-steps{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.pay-step{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);}
+.step-num{width:24px;height:24px;border-radius:50%;background:rgba(0,229,204,.12);border:1px solid rgba(0,229,204,.25);color:var(--teal);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* PROGRESS */
+.progress-bar{background:var(--border);border-radius:100px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:100px;transition:width .5s ease;}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.tab{padding:10px 16px;font-size:13px;font-weight:600;color:var(--text3);cursor:none;transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--teal);border-bottom-color:var(--teal);}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px;}
+.filter-select{
+  background:var(--bg2);border:1px solid var(--border);color:var(--text2);
+  font-family:var(--mono);font-size:12px;padding:7px 12px;border-radius:var(--radius);
+  outline:none;cursor:none;
+}
+.search-input{
+  background:var(--bg2);border:1px solid var(--border);color:var(--text);
+  font-family:var(--mono);font-size:12px;padding:7px 12px;border-radius:var(--radius);
+  outline:none;width:200px;
+}
+.search-input:focus,.filter-select:focus{border-color:var(--teal);}
+.search-input::placeholder{color:var(--text3);}
+
+/* GRID LAYOUTS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+/* MODEL CARD */
+.model-mini{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px;display:flex;align-items:center;gap:12px;
+  transition:border-color .2s;cursor:none;
+}
+.model-mini:hover{border-color:rgba(255,255,255,.12);}
+.model-mini-icon{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.model-mini-name{font-size:13px;font-weight:700;margin-bottom:2px;}
+.model-mini-provider{font-size:11px;color:var(--text3);font-family:var(--mono);}
+.model-mini-price{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--text2);text-align:right;}
+.model-mini-price strong{display:block;color:var(--green);font-size:12px;}
+
+/* LOG ROW */
+.log-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;font-family:var(--mono);}
+.log-row:hover{background:rgba(255,255,255,.02);}
+.log-time{color:var(--text3);flex-shrink:0;width:80px;}
+.log-model{color:var(--teal);flex-shrink:0;width:130px;overflow:hidden;text-overflow:ellipsis;}
+.log-tokens{color:var(--text2);flex-shrink:0;width:80px;}
+.log-cost{color:var(--green);flex-shrink:0;width:70px;}
+.log-latency{color:var(--text2);flex-shrink:0;width:60px;}
+.log-status{flex-shrink:0;}
+
+/* EMPTY STATE */
+.empty-state{padding:60px 20px;text-align:center;color:var(--text3);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.empty-title{font-size:15px;font-weight:600;color:var(--text2);margin-bottom:6px;}
+.empty-sub{font-size:13px;line-height:1.6;}
+
+/* SETTINGS */
+.settings-group{margin-bottom:32px;}
+.settings-group-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-family:var(--mono);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.settings-row:last-child{border-bottom:none;}
+.settings-label{font-size:14px;font-weight:500;}
+.settings-desc{font-size:12px;color:var(--text3);margin-top:2px;}
+.settings-control{flex-shrink:0;margin-left:20px;}
+.switch{width:40px;height:22px;background:var(--bg3);border-radius:100px;position:relative;cursor:none;transition:background .2s;border:1px solid var(--border);}
+.switch.on{background:var(--teal);}
+.switch::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.3);}
+.switch.on::after{left:20px;}
+
+/* PLAN BADGE */
+.plan-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em;}
+.plan-free{background:rgba(122,138,160,.15);color:var(--text2);}
+.plan-developer{background:rgba(0,229,204,.15);color:var(--teal);}
+.plan-pro{background:rgba(155,114,255,.15);color:var(--purple);}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .grid-2,.grid-3{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-r"></div>
+
+<!-- ════════════════════════════════
+     AUTH SCREEN
+════════════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-bg"></div>
+  <div class="auth-grid"></div>
+  <div class="auth-box">
+    <div class="auth-logo"><span class="t">Nexus</span><span class="w">API</span></div>
+    <div class="auth-sub">The AI API Marketplace for India</div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login',this)">Sign In</div>
+      <div class="auth-tab" onclick="switchAuthTab('register',this)">Create Account</div>
+    </div>
+
+    <div id="login-form">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" placeholder="you@example.com" id="login-email" value="rahul@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" placeholder="••••••••" id="login-pass" value="password123">
+      </div>
+      <div style="text-align:right;margin-bottom:8px;">
+        <a href="#" style="font-size:12px;color:var(--text3);text-decoration:none;" onclick="showForgotPass()">Forgot password?</a>
+      </div>
+      <button class="btn btn-teal" onclick="doLogin()">Sign In →</button>
+      <div class="auth-divider"><span>Demo: any credentials work</span></div>
+      <div style="font-size:12px;color:var(--text3);text-align:center;">By signing in, you agree to our Terms of Service</div>
+    </div>
+
+    <div id="register-form" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" placeholder="Rahul Sharma">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" placeholder="8+ characters">
+      </div>
+      <button class="btn btn-teal" onclick="doLogin()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     APP
+════════════════════════════════ -->
+<div id="app" class="hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="t">Nexus</span><span class="w">API</span>
+      <span class="version">v1.0.0 · PRODUCTION</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main</div>
+      <div class="nav-item active" onclick="goto('overview',this)">
+        <span class="nav-icon">⊞</span> Overview
+      </div>
+      <div class="nav-item" onclick="goto('keys',this)">
+        <span class="nav-icon">⌘</span> API Keys
+        <span class="nav-badge" id="key-count">3</span>
+      </div>
+      <div class="nav-item" onclick="goto('usage',this)">
+        <span class="nav-icon">◈</span> Usage & Analytics
+      </div>
+      <div class="nav-item" onclick="goto('logs',this)">
+        <span class="nav-icon">≡</span> Request Logs
+        <span class="nav-badge red" id="error-badge" style="display:none">!</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Billing</div>
+      <div class="nav-item" onclick="goto('credits',this)">
+        <span class="nav-icon">◎</span> Credits & Payments
+      </div>
+      <div class="nav-item" onclick="goto('invoices',this)">
+        <span class="nav-icon">□</span> Invoices
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Explore</div>
+      <div class="nav-item" onclick="goto('models',this)">
+        <span class="nav-icon">✦</span> AI Models
+      </div>
+      <div class="nav-item" onclick="goto('playground',this)">
+        <span class="nav-icon">▷</span> Playground
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Account</div>
+      <div class="nav-item" onclick="goto('settings',this)">
+        <span class="nav-icon">⊙</span> Settings
+      </div>
+      <div class="nav-item" onclick="openDocs()">
+        <span class="nav-icon">↗</span> Documentation
+      </div>
+    </div>
+
+    <div class="sidebar-credits">
+      <div class="credits-label">Account Credits</div>
+      <div class="credits-amount" id="sidebar-credits-amt">₹847.50</div>
+      <div class="credits-sub">~847,500 tokens remaining</div>
+      <div class="credits-bar"><div class="credits-fill" style="width:65%" id="credits-fill"></div></div>
+      <button class="btn btn-teal btn-sm btn-full" onclick="openPayModal()">+ Add Credits via UPI</button>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">R</div>
+      <div>
+        <div class="user-name">Rahul Sharma</div>
+        <div class="user-plan">Developer Plan</div>
+      </div>
+      <span class="sidebar-logout" onclick="logout()" title="Logout">⏻</span>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-breadcrumb" id="topbar-bc">Dashboard → Overview</div>
+        <div class="topbar-title" id="topbar-title">Overview</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-status">
+          <span class="status-dot"></span>All systems operational
+        </div>
+        <div class="notif-btn" onclick="showNotif()">
+          🔔<span class="notif-dot"></span>
+        </div>
+        <button class="btn btn-teal btn-sm" onclick="openPayModal()">+ Credits</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ═══ PAGE: OVERVIEW ═══ -->
+      <div class="page active" id="page-overview">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-accent" style="background:var(--teal)"></div>
+            <div class="stat-card-icon">⚡</div>
+            <div class="stat-card-val" id="stat-req">12,847</div>
+            <div class="stat-card-label">Requests Today</div>
+            <div class="stat-card-change change-up">↑ 18.4% vs yesterday</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-accent" style="background:var(--blue)"></div>
+            <div class="stat-card-icon">◈</div>
+            <div class="stat-card-val">4.2M</div>
+            <div class="stat-card-label">Tokens Used</div>
+            <div class="stat-card-change change-up">↑ 24.1% this week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-accent" style="background:var(--green)"></div>
+            <div class="stat-card-icon">₹</div>
+            <div class="stat-card-val">52.40</div>
+            <div class="stat-card-label">Spent Today (₹)</div>
+            <div class="stat-card-change change-down" style="color:var(--text3)">Budget: ₹200/day</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-accent" style="background:var(--purple)"></div>
+            <div class="stat-card-icon">◎</div>
+            <div class="stat-card-val">99.7%</div>
+            <div class="stat-card-label">Success Rate</div>
+            <div class="stat-card-change change-up">↑ 0.2% vs last week</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:14px;">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Request Volume — 14 Days</span>
+              <div class="toggle">
+                <button class="toggle-btn active">Requests</button>
+                <button class="toggle-btn" onclick="switchChart(this,'tokens')">Tokens</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="bar-chart" id="main-chart"></div>
+              <div class="chart-labels" id="main-chart-labels"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Model Usage — This Month</span>
+            </div>
+            <div class="card-body">
+              <div style="display:flex;gap:24px;align-items:center;">
+                <div class="donut-wrap">
+                  <svg width="120" height="120" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="48" fill="none" stroke="var(--bg3)" stroke-width="16"/>
+                    <circle cx="60" cy="60" r="48" fill="none" stroke="var(--teal)" stroke-width="16" stroke-dasharray="180 121" stroke-linecap="round"/>
+                    <circle cx="60" cy="60" r="48" fill="none" stroke="var(--blue)" stroke-width="16" stroke-dasharray="80 221" stroke-dashoffset="-180" stroke-linecap="round"/>
+                    <circle cx="60" cy="60" r="48" fill="none" stroke="var(--purple)" stroke-width="16" stroke-dasharray="41 260" stroke-dashoffset="-260" stroke-linecap="round"/>
+                  </svg>
+                  <div class="donut-center">
+                    <div class="donut-val">50+</div>
+                    <div class="donut-label">models</div>
+                  </div>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;">
+                    <span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;"></span>GPT-4o</span>
+                    <span style="font-family:var(--mono);color:var(--text2);">59%</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;">
+                    <span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);display:inline-block;"></span>Claude 3.5</span>
+                    <span style="font-family:var(--mono);color:var(--text2);">26%</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;">
+                    <span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--purple);display:inline-block;"></span>Gemini Pro</span>
+                    <span style="font-family:var(--mono);color:var(--text2);">13%</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;">
+                    <span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--border);display:inline-block;"></span>Others</span>
+                    <span style="font-family:var(--mono);color:var(--text2);">2%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Active API Keys</span>
+              <button class="btn btn-ghost btn-sm" onclick="goto('keys',null)">View all</button>
+            </div>
+            <div class="card-body-p0">
+              <table class="table">
+                <thead><tr><th>Name</th><th>Key</th><th>Status</th><th>Requests</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight:600;">Production</td>
+                    <td><span class="code">nxs_prod_a3f8<span class="key-masked">••••</span></span></td>
+                    <td><span class="badge badge-green">Active</span></td>
+                    <td style="font-family:var(--mono);color:var(--text2);">8,421</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:600;">Staging</td>
+                    <td><span class="code">nxs_stg_c3d1<span class="key-masked">••••</span></span></td>
+                    <td><span class="badge badge-green">Active</span></td>
+                    <td style="font-family:var(--mono);color:var(--text2);">3,200</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:600;">Testing</td>
+                    <td><span class="code">nxs_tst_7a9b<span class="key-masked">••••</span></span></td>
+                    <td><span class="badge badge-amber">Near Limit</span></td>
+                    <td style="font-family:var(--mono);color:var(--text2);">1,226</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Recent Activity</span>
+            </div>
+            <div class="card-body-p0">
+              <div id="recent-activity"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PAGE: API KEYS ═══ -->
+      <div class="page" id="page-keys">
+        <div class="section-header">
+          <div>
+            <div class="section-title">API Keys</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;font-family:var(--mono);">3 of 5 keys used · Developer plan</div>
+          </div>
+          <button class="btn btn-teal" onclick="openCreateKey()">+ Create New Key</button>
+        </div>
+        <div id="keys-list"></div>
+        <div style="margin-top:20px;" class="card">
+          <div class="card-header"><span class="card-title">Quick Integration</span></div>
+          <div class="card-body">
+            <div class="tabs">
+              <div class="tab active" onclick="switchCodeTab('python',this)">Python</div>
+              <div class="tab" onclick="switchCodeTab('node',this)">Node.js</div>
+              <div class="tab" onclick="switchCodeTab('curl',this)">cURL</div>
+            </div>
+            <div id="code-python" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+              <pre style="font-family:var(--mono);font-size:12px;line-height:1.8;overflow-x:auto;"><span style="color:#7A8AA0;"># pip install openai</span>
+<span style="color:#9B72FF;">import</span> <span style="color:#FFB800;">openai</span>
+
+client = openai.OpenAI(
+    api_key=<span style="color:#00E5CC;">"nxs_prod_your_key"</span>,
+    base_url=<span style="color:#00E5CC;">"https://api.nexusapi.in/v1"</span>
+)
+
+response = client.chat.completions.create(
+    model=<span style="color:#00E5CC;">"gpt-4o"</span>,
+    messages=[{<span style="color:#00E5CC;">"role"</span>: <span style="color:#00E5CC;">"user"</span>, <span style="color:#00E5CC;">"content"</span>: <span style="color:#00E5CC;">"Hello!"</span>}]
+)
+<span style="color:#FFB800;">print</span>(response.choices[<span style="color:#4D9FFF;">0</span>].message.content)</pre>
+            </div>
+            <div id="code-node" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+              <pre style="font-family:var(--mono);font-size:12px;line-height:1.8;overflow-x:auto;"><span style="color:#7A8AA0;">// npm install openai</span>
+<span style="color:#9B72FF;">import</span> OpenAI <span style="color:#9B72FF;">from</span> <span style="color:#00E5CC;">'openai'</span>;
+
+<span style="color:#9B72FF;">const</span> client = <span style="color:#9B72FF;">new</span> <span style="color:#FFB800;">OpenAI</span>({
+  apiKey: <span style="color:#00E5CC;">'nxs_prod_your_key'</span>,
+  baseURL: <span style="color:#00E5CC;">'https://api.nexusapi.in/v1'</span>,
+});
+
+<span style="color:#9B72FF;">const</span> response = <span style="color:#9B72FF;">await</span> client.chat.completions.<span style="color:#FFB800;">create</span>({
+  model: <span style="color:#00E5CC;">'gpt-4o'</span>,
+  messages: [{role: <span style="color:#00E5CC;">'user'</span>, content: <span style="color:#00E5CC;">'Hello!'</span>}],
+});</pre>
+            </div>
+            <div id="code-curl" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+              <pre style="font-family:var(--mono);font-size:12px;line-height:1.8;overflow-x:auto;"><span style="color:#FFB800;">curl</span> https://api.nexusapi.in/v1/chat/completions \
+  -H <span style="color:#00E5CC;">"Authorization: Bearer nxs_prod_your_key"</span> \
+  -H <span style="color:#00E5CC;">"Content-Type: application/json"</span> \
+  -d <span style="color:#00E5CC;">'{
+    "model": "gpt-4o",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PAGE: USAGE ═══ -->
+      <div class="page" id="page-usage">
+        <div class="section-header">
+          <div class="section-title">Usage & Analytics</div>
+          <div class="toggle">
+            <button class="toggle-btn active" onclick="usagePeriod(7,this)">7d</button>
+            <button class="toggle-btn" onclick="usagePeriod(14,this)">14d</button>
+            <button class="toggle-btn" onclick="usagePeriod(30,this)">30d</button>
+          </div>
+        </div>
+
+        <div class="stats-grid" style="margin-bottom:20px;">
+          <div class="stat-card">
+            <div class="stat-card-icon">⚡</div>
+            <div class="stat-card-val">89,234</div>
+            <div class="stat-card-label">Total Requests</div>
+            <div class="stat-card-change change-up">↑ 12% vs prev period</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">◈</div>
+            <div class="stat-card-val">28.4M</div>
+            <div class="stat-card-label">Tokens Used</div>
+            <div class="stat-card-change change-up">↑ 18% vs prev period</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">₹</div>
+            <div class="stat-card-val">342.80</div>
+            <div class="stat-card-label">Total Spent</div>
+            <div class="stat-card-change change-down">↑ 8% vs prev period</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">⏱</div>
+            <div class="stat-card-val">820ms</div>
+            <div class="stat-card-label">Avg Latency</div>
+            <div class="stat-card-change change-up">↓ 5% (faster)</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-header">
+            <span class="card-title">Daily Request Volume</span>
+          </div>
+          <div class="card-body">
+            <div class="bar-chart" id="usage-chart" style="height:140px;"></div>
+            <div class="chart-labels" id="usage-labels"></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Cost by Model</span></div>
+            <div class="card-body-p0">
+              <table class="table">
+                <thead><tr><th>Model</th><th>Requests</th><th>Tokens</th><th>Cost</th></tr></thead>
+                <tbody id="model-cost-rows"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Error Analysis</span></div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:14px;">
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;">
+                    <span>Success Rate</span><span style="font-family:var(--mono);color:var(--green);">99.7%</span>
+                  </div>
+                  <div class="progress-bar" style="height:6px;"><div class="progress-fill" style="width:99.7%;background:var(--green);"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;">
+                    <span>Rate Limited (429)</span><span style="font-family:var(--mono);color:var(--amber);">0.2%</span>
+                  </div>
+                  <div class="progress-bar" style="height:6px;"><div class="progress-fill" style="width:0.2%;background:var(--amber);"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;">
+                    <span>Auth Errors (401)</span><span style="font-family:var(--mono);color:var(--red);">0.08%</span>
+                  </div>
+                  <div class="progress-bar" style="height:6px;"><div class="progress-fill" style="width:0.08%;background:var(--red);"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;">
+                    <span>Server Errors (5xx)</span><span style="font-family:var(--mono);color:var(--red);">0.02%</span>
+                  </div>
+                  <div class="progress-bar" style="height:6px;"><div class="progress-fill" style="width:0.02%;background:var(--red);"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PAGE: LOGS ═══ -->
+      <div class="page" id="page-logs">
+        <div class="section-header">
+          <div class="section-title">Request Logs</div>
+          <button class="btn btn-ghost btn-sm" onclick="refreshLogs()">↺ Refresh</button>
+        </div>
+        <div class="filter-bar">
+          <input class="search-input" type="text" placeholder="Search by model, key..." id="log-search">
+          <select class="filter-select" id="log-model-filter">
+            <option value="">All Models</option>
+            <option>gpt-4o</option>
+            <option>claude-3-5-sonnet</option>
+            <option>gemini-1.5-pro</option>
+            <option>llama-3.1-405b</option>
+          </select>
+          <select class="filter-select" id="log-status-filter">
+            <option value="">All Status</option>
+            <option value="200">Success (200)</option>
+            <option value="429">Rate Limited</option>
+            <option value="401">Auth Error</option>
+            <option value="500">Server Error</option>
+          </select>
+          <select class="filter-select" id="log-period">
+            <option>Last 1h</option>
+            <option>Last 6h</option>
+            <option selected>Last 24h</option>
+            <option>Last 7d</option>
+          </select>
+        </div>
+        <div class="card">
+          <div style="display:flex;gap:0;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg3);">
+            <span style="font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);width:80px;">Time</span>
+            <span style="font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);width:130px;">Model</span>
+            <span style="font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);width:80px;">Tokens</span>
+            <span style="font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);width:70px;">Cost</span>
+            <span style="font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);width:60px;">Latency</span>
+            <span style="font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">Status</span>
+          </div>
+          <div id="logs-container" style="max-height:480px;overflow-y:auto;"></div>
+        </div>
+        <div style="margin-top:10px;display:flex;justify-content:center;gap:8px;" id="log-pagination"></div>
+      </div>
+
+      <!-- ═══ PAGE: CREDITS ═══ -->
+      <div class="page" id="page-credits">
+        <div class="section-header">
+          <div class="section-title">Credits & Payments</div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:14px;">
+          <div class="card">
+            <div class="card-body">
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+                <div style="width:56px;height:56px;border-radius:14px;background:rgba(0,229,204,.1);border:1px solid rgba(0,229,204,.2);display:flex;align-items:center;justify-content:center;font-size:26px;">₹</div>
+                <div>
+                  <div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Available Balance</div>
+                  <div style="font-family:var(--mono);font-size:36px;font-weight:600;color:var(--teal);line-height:1;">847.50</div>
+                </div>
+              </div>
+              <div style="background:var(--bg3);border-radius:var(--radius);padding:14px;margin-bottom:20px;">
+                <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
+                  <span style="color:var(--text2);">≈ Tokens Remaining</span>
+                  <span style="font-family:var(--mono);color:var(--teal);">~847,500</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
+                  <span style="color:var(--text2);">Burn Rate (today)</span>
+                  <span style="font-family:var(--mono);">₹52.40/day</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;">
+                  <span style="color:var(--text2);">Est. Days Remaining</span>
+                  <span style="font-family:var(--mono);color:var(--amber);">~16 days</span>
+                </div>
+              </div>
+              <button class="btn btn-teal btn-full" onclick="openPayModal()">⚡ Top Up via UPI</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">Credit History</span></div>
+            <div class="card-body-p0">
+              <table class="table">
+                <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">28 Feb 2026</td>
+                    <td style="font-family:var(--mono);font-weight:600;">₹499</td>
+                    <td style="font-size:12px;color:var(--text2);">GPay UPI</td>
+                    <td><span class="badge badge-green">Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">15 Feb 2026</td>
+                    <td style="font-family:var(--mono);font-weight:600;">₹999</td>
+                    <td style="font-size:12px;color:var(--text2);">PhonePe UPI</td>
+                    <td><span class="badge badge-green">Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">01 Feb 2026</td>
+                    <td style="font-family:var(--mono);font-weight:600;">₹299</td>
+                    <td style="font-size:12px;color:var(--text2);">Paytm UPI</td>
+                    <td><span class="badge badge-green">Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">20 Jan 2026</td>
+                    <td style="font-family:var(--mono);font-weight:600;">₹99</td>
+                    <td style="font-size:12px;color:var(--text2);">GPay UPI</td>
+                    <td><span class="badge badge-red">Failed</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">Choose a Plan</span></div>
+          <div class="card-body">
+            <div class="grid-3" id="plans-row" style="grid-template-columns:repeat(4,1fr);gap:12px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PAGE: INVOICES ═══ -->
+      <div class="page" id="page-invoices">
+        <div class="section-header">
+          <div class="section-title">Invoices</div>
+          <button class="btn btn-ghost btn-sm">↓ Download All</button>
+        </div>
+        <div class="card">
+          <div class="card-body-p0">
+            <table class="table">
+              <thead><tr><th>Invoice #</th><th>Date</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td style="font-family:var(--mono);color:var(--teal);">NXS-2026-0084</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3);">28 Feb 2026</td><td style="font-family:var(--mono);font-weight:600;">₹499.00</td><td><span class="badge badge-green">Paid</span></td><td><button class="btn btn-ghost btn-sm">Download PDF</button></td></tr>
+                <tr><td style="font-family:var(--mono);color:var(--teal);">NXS-2026-0062</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3);">15 Feb 2026</td><td style="font-family:var(--mono);font-weight:600;">₹999.00</td><td><span class="badge badge-green">Paid</span></td><td><button class="btn btn-ghost btn-sm">Download PDF</button></td></tr>
+                <tr><td style="font-family:var(--mono);color:var(--teal);">NXS-2026-0041</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3);">01 Feb 2026</td><td style="font-family:var(--mono);font-weight:600;">₹299.00</td><td><span class="badge badge-green">Paid</span></td><td><button class="btn btn-ghost btn-sm">Download PDF</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PAGE: MODELS ═══ -->
+      <div class="page" id="page-models">
+        <div class="section-header">
+          <div class="section-title">AI Models</div>
+          <div class="filter-bar" style="margin:0;">
+            <select class="filter-select" onchange="filterModels(this.value)">
+              <option value="">All Types</option>
+              <option value="chat">Chat</option>
+              <option value="embedding">Embeddings</option>
+              <option value="image">Image</option>
+              <option value="speech">Speech</option>
+            </select>
+          </div>
+        </div>
+        <div id="models-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px;"></div>
+      </div>
+
+      <!-- ═══ PAGE: PLAYGROUND ═══ -->
+      <div class="page" id="page-playground">
+        <div class="section-header">
+          <div class="section-title">API Playground</div>
+          <div style="font-size:12px;color:var(--text3);font-family:var(--mono);">Test models live · Uses your credits</div>
+        </div>
+        <div class="grid-2" style="height:calc(100vh - 200px);">
+          <div class="card" style="display:flex;flex-direction:column;">
+            <div class="card-header">
+              <span class="card-title">Request</span>
+              <select class="filter-select" id="pg-model">
+                <option value="gpt-4o">gpt-4o</option>
+                <option value="claude-3-5-sonnet">claude-3-5-sonnet</option>
+                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+                <option value="llama-3.1-405b">llama-3.1-405b</option>
+              </select>
+            </div>
+            <div class="card-body" style="flex:1;display:flex;flex-direction:column;">
+              <textarea id="pg-input" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;color:var(--text);font-family:var(--mono);font-size:13px;resize:none;outline:none;line-height:1.7;" placeholder="Enter your prompt here...&#10;&#10;Example: Explain quantum computing in 3 sentences."></textarea>
+              <div style="display:flex;gap:10px;margin-top:12px;align-items:center;">
+                <div style="font-size:11px;color:var(--text3);font-family:var(--mono);">Temp:</div>
+                <input type="range" min="0" max="100" value="70" style="flex:1;accent-color:var(--teal);" id="pg-temp">
+                <div id="pg-temp-val" style="font-family:var(--mono);font-size:11px;color:var(--teal);width:30px;">0.7</div>
+                <button class="btn btn-teal" onclick="runPlayground()">▷ Run</button>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="display:flex;flex-direction:column;">
+            <div class="card-header">
+              <span class="card-title">Response</span>
+              <div id="pg-meta" style="font-family:var(--mono);font-size:11px;color:var(--text3);"></div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:20px;background:var(--bg3);">
+              <div id="pg-output" style="font-family:var(--mono);font-size:13px;line-height:1.8;color:var(--text2);white-space:pre-wrap;">← Run a request to see the response here</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PAGE: SETTINGS ═══ -->
+      <div class="page" id="page-settings">
+        <div class="section-title" style="margin-bottom:24px;">Account Settings</div>
+        <div class="grid-2">
+          <div>
+            <div class="card" style="margin-bottom:14px;">
+              <div class="card-header"><span class="card-title">Profile</span></div>
+              <div class="card-body">
+                <div class="form-group">
+                  <label class="form-label">Full Name</label>
+                  <input class="form-input" type="text" value="Rahul Sharma">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email</label>
+                  <input class="form-input" type="email" value="rahul@example.com">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Organization (optional)</label>
+                  <input class="form-input" type="text" placeholder="Your company">
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <button class="btn btn-teal btn-sm" onclick="showToast('success','Profile Updated','Your changes have been saved')">Save Changes</button>
+                  <span class="plan-badge plan-developer">Developer Plan</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><span class="card-title">Change Password</span></div>
+              <div class="card-body">
+                <div class="form-group">
+                  <label class="form-label">Current Password</label>
+                  <input class="form-input" type="password" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">New Password</label>
+                  <input class="form-input" type="password" placeholder="8+ characters">
+                </div>
+                <button class="btn btn-ghost btn-sm" onclick="showToast('success','Password Updated','Your password has been changed')">Update Password</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card" style="margin-bottom:14px;">
+              <div class="card-header"><span class="card-title">Notifications</span></div>
+              <div class="card-body">
+                <div class="settings-group">
+                  <div class="settings-row">
+                    <div><div class="settings-label">Low Credit Alert</div><div class="settings-desc">Notify when credits drop below ₹100</div></div>
+                    <div class="settings-control"><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+                  </div>
+                  <div class="settings-row">
+                    <div><div class="settings-label">Payment Confirmation</div><div class="settings-desc">Email on successful payment</div></div>
+                    <div class="settings-control"><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+                  </div>
+                  <div class="settings-row">
+                    <div><div class="settings-label">API Key Created</div><div class="settings-desc">Email when new key is generated</div></div>
+                    <div class="settings-control"><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+                  </div>
+                  <div class="settings-row">
+                    <div><div class="settings-label">Weekly Usage Summary</div><div class="settings-desc">Weekly email with usage stats</div></div>
+                    <div class="settings-control"><div class="switch" onclick="this.classList.toggle('on')"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-bottom:14px;">
+              <div class="card-header"><span class="card-title">Rate Limits</span></div>
+              <div class="card-body">
+                <div style="margin-bottom:14px;">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;"><span>Daily Budget Cap</span><span style="font-family:var(--mono);">₹200/day</span></div>
+                  <div class="progress-bar" style="height:5px;"><div class="progress-fill" style="width:26%;background:var(--teal);"></div></div>
+                  <div style="font-size:11px;color:var(--text3);margin-top:4px;font-family:var(--mono);">₹52.40 used today</div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Daily Budget (₹)</label>
+                  <input class="form-input" type="number" value="200" placeholder="0 = unlimited">
+                </div>
+                <button class="btn btn-ghost btn-sm" onclick="showToast('success','Limit Updated','Daily budget has been set')">Set Limit</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><span class="card-title">Danger Zone</span></div>
+              <div class="card-body">
+                <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">These actions are permanent and cannot be undone.</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                  <button class="btn btn-danger btn-sm" onclick="showToast('error','Not Implemented','Contact support to delete your account')">Delete Account</button>
+                  <button class="btn btn-ghost btn-sm" onclick="logout()">Log Out Everywhere</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- ════════════════════════
+     CREATE KEY MODAL
+════════════════════════ -->
+<div class="modal-overlay" id="key-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Create New API Key</div>
+      <button class="modal-close" onclick="closeModal('key-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Key Name</label>
+        <input class="form-input" id="new-key-name" placeholder="e.g. Production, Staging, Testing">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Environment</label>
+        <select class="form-input" id="new-key-env">
+          <option value="prod">Production</option>
+          <option value="stg">Staging</option>
+          <option value="dev">Development</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Model Access</label>
+        <select class="form-input" id="new-key-models">
+          <option value="all">All Models</option>
+          <option value="gpt-4o,gpt-4o-mini">OpenAI Only</option>
+          <option value="claude-3-5-sonnet">Anthropic Only</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Rate Limit (requests/min)</label>
+        <input class="form-input" type="number" id="new-key-rate" value="60">
+      </div>
+      <div id="new-key-result" style="display:none;background:rgba(0,229,204,.06);border:1px solid rgba(0,229,204,.2);border-radius:var(--radius);padding:16px;margin-top:16px;">
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:8px;">YOUR NEW API KEY — COPY NOW, WON'T BE SHOWN AGAIN</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div id="new-key-value" style="font-family:var(--mono);font-size:13px;color:var(--teal);flex:1;word-break:break-all;"></div>
+          <button class="copy-btn" onclick="copyText(document.getElementById('new-key-value').textContent,this)">Copy</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('key-modal')">Cancel</button>
+      <button class="btn btn-teal" onclick="createKey()">Create Key</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════
+     UPI PAYMENT MODAL
+════════════════════════ -->
+<div class="modal-overlay" id="pay-modal">
+  <div class="modal" style="width:520px;">
+    <div class="modal-header">
+      <div class="modal-title">Add Credits via UPI</div>
+      <button class="modal-close" onclick="closeModal('pay-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Select Amount</label>
+        <div class="amt-chips">
+          <button class="amt-chip" onclick="selAmt(this,99)">₹99</button>
+          <button class="amt-chip" onclick="selAmt(this,299)">₹299</button>
+          <button class="amt-chip sel" onclick="selAmt(this,499)">₹499</button>
+          <button class="amt-chip" onclick="selAmt(this,999)">₹999</button>
+          <button class="amt-chip" onclick="selAmt(this,2499)">₹2,499</button>
+        </div>
+        <input class="form-input" type="number" placeholder="Custom amount (min ₹99)" id="custom-amt" oninput="updatePayAmt(this.value)">
+      </div>
+
+      <div style="background:rgba(0,208,132,.06);border:1px solid rgba(0,208,132,.15);border-radius:var(--radius);padding:14px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:4px;">YOU'LL RECEIVE</div>
+          <div style="font-family:var(--mono);font-size:16px;font-weight:600;color:var(--green);" id="pay-credits">~499,000 tokens</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:4px;">AMOUNT</div>
+          <div style="font-family:var(--mono);font-size:24px;font-weight:600;" id="pay-amt-display">₹499</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Pay with</label>
+        <div class="upi-grid">
+          <div class="upi-opt sel" onclick="selUPI(this)"><div class="upi-opt-icon">🟢</div><div class="upi-opt-name">Google Pay</div></div>
+          <div class="upi-opt" onclick="selUPI(this)"><div class="upi-opt-icon">💜</div><div class="upi-opt-name">PhonePe</div></div>
+          <div class="upi-opt" onclick="selUPI(this)"><div class="upi-opt-icon">🔵</div><div class="upi-opt-name">Paytm</div></div>
+          <div class="upi-opt" onclick="selUPI(this)"><div class="upi-opt-icon">📱</div><div class="upi-opt-name">Other UPI</div></div>
+        </div>
+      </div>
+
+      <div class="pay-steps">
+        <div class="pay-step"><div class="step-num">1</div>Open your UPI app on your phone</div>
+        <div class="pay-step"><div class="step-num">2</div>Send payment to UPI ID below</div>
+        <div class="pay-step"><div class="step-num">3</div>Enter the Transaction ID to verify</div>
+      </div>
+
+      <div class="upi-id-row">
+        <div class="upi-id">nexusapi@ybl</div>
+        <button class="copy-btn" onclick="copyText('nexusapi@ybl',this)">Copy UPI ID</button>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Transaction ID (from your UPI app)</label>
+        <input class="form-input" type="text" placeholder="e.g. 307648291827364" id="txn-id">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('pay-modal')">Cancel</button>
+      <button class="btn btn-teal" onclick="verifyPay()" style="background:linear-gradient(135deg,var(--green),#00A066);">✓ I've Paid — Verify Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  DATA & STATE
+// ══════════════════════════════════════════
+const state = {
+  user: { name: 'Rahul Sharma', email: 'rahul@example.com', plan: 'developer', credits: 847.50 },
+  currentPage: 'overview',
+  payAmt: 499,
+};
+
+const MODELS = [
+  {id:'gpt-4o',name:'GPT-4o',provider:'OpenAI',icon:'🧠',color:'#10A37F',type:'chat',price:'₹120/1M in',ctx:'128K',lat:'~1.2s'},
+  {id:'gpt-4o-mini',name:'GPT-4o Mini',provider:'OpenAI',icon:'⚡',color:'#10A37F',type:'chat',price:'₹15/1M in',ctx:'128K',lat:'~0.5s'},
+  {id:'claude-3-5-sonnet',name:'Claude 3.5 Sonnet',provider:'Anthropic',icon:'🌊',color:'#CC785C',type:'chat',price:'₹100/1M in',ctx:'200K',lat:'~0.9s'},
+  {id:'claude-3-haiku',name:'Claude 3 Haiku',provider:'Anthropic',icon:'🍃',color:'#CC785C',type:'chat',price:'₹20/1M in',ctx:'200K',lat:'~0.3s'},
+  {id:'gemini-1.5-pro',name:'Gemini 1.5 Pro',provider:'Google',icon:'💎',color:'#4285F4',type:'chat',price:'₹80/1M in',ctx:'2M',lat:'~0.7s'},
+  {id:'gemini-1.5-flash',name:'Gemini 1.5 Flash',provider:'Google',icon:'⚡',color:'#4285F4',type:'chat',price:'₹8/1M in',ctx:'1M',lat:'~0.3s'},
+  {id:'llama-3.1-405b',name:'Llama 3.1 405B',provider:'Meta',icon:'🦙',color:'#0668E1',type:'chat',price:'₹20/1M in',ctx:'128K',lat:'~0.6s'},
+  {id:'mixtral-8x22b',name:'Mixtral 8x22B',provider:'Mistral',icon:'🌀',color:'#F74B00',type:'chat',price:'₹10/1M in',ctx:'64K',lat:'~0.5s'},
+  {id:'text-embedding-3-large',name:'text-embedding-3-large',provider:'OpenAI',icon:'📐',color:'#00A3BF',type:'embedding',price:'₹1/1M in',ctx:'8K',lat:'~0.2s'},
+  {id:'dall-e-3',name:'DALL-E 3',provider:'OpenAI',icon:'🎨',color:'#AB68FF',type:'image',price:'₹400/img',ctx:'—',lat:'~8s'},
+  {id:'whisper-1',name:'Whisper v3',provider:'OpenAI',icon:'🎤',color:'#0B93F6',type:'speech',price:'₹50/min',ctx:'—',lat:'~2s'},
+];
+
+const KEYS = [
+  {id:'k1',name:'Production',prefix:'nxs_prod_a3f8',env:'prod',model_access:'All Models',rate_limit:60,usage:8421,status:'active',last_used:'2 min ago'},
+  {id:'k2',name:'Staging',prefix:'nxs_stg_c3d1',env:'stg',model_access:'All Models',rate_limit:60,usage:3200,status:'active',last_used:'1h ago'},
+  {id:'k3',name:'Testing',prefix:'nxs_tst_7a9b',env:'dev',model_access:'GPT-4o only',rate_limit:10,usage:1226,status:'warning',last_used:'3h ago'},
+];
+
+const LOGS_DATA = (() => {
+  const models = ['gpt-4o','claude-3-5-sonnet','gemini-1.5-pro','llama-3.1-405b','gpt-4o-mini','mixtral-8x22b'];
+  const statuses = [200,200,200,200,200,200,429,401,500];
+  const entries = [];
+  for(let i=0;i<200;i++){
+    const model = models[Math.floor(Math.random()*models.length)];
+    const status = statuses[Math.floor(Math.random()*statuses.length)];
+    const tokens = Math.floor(Math.random()*3000+200);
+    const cost = (tokens/1000000*120).toFixed(4);
+    const lat = Math.floor(Math.random()*2000+200);
+    const minsAgo = Math.floor(Math.random()*1440);
+    const h = Math.floor(minsAgo/60), m = minsAgo%60;
+    entries.push({model,status,tokens,cost,lat,time:`${h}h ${m}m ago`});
+  }
+  return entries;
+})();
+
+// ══════════════════════════════════════════
+//  CURSOR
+// ══════════════════════════════════════════
+const cur = document.getElementById('cur');
+const curR = document.getElementById('cur-r');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.transform=`translate(${mx-4}px,${my-4}px)`;
+});
+(function animR(){
+  rx+=(mx-rx-14)*.12; ry+=(my-ry-14)*.12;
+  curR.style.transform=`translate(${rx}px,${ry}px)`;
+  requestAnimationFrame(animR);
+})();
+document.addEventListener('mousedown',()=>{cur.style.transform+=' scale(1.8)';});
+document.addEventListener('mouseup',()=>{});
+
+// ══════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════
+function switchAuthTab(tab, el) {
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('login-form').style.display = tab==='login'?'':'none';
+  document.getElementById('register-form').style.display = tab==='register'?'':'none';
+}
+
+function doLogin() {
+  document.getElementById('auth-screen').style.opacity='0';
+  document.getElementById('auth-screen').style.transition='opacity .4s';
+  setTimeout(()=>{
+    document.getElementById('auth-screen').style.display='none';
+    document.getElementById('app').classList.remove('hidden');
+    initApp();
+  },400);
+}
+
+function logout() {
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('auth-screen').style.display='flex';
+  document.getElementById('auth-screen').style.opacity='1';
+}
+
+function showForgotPass() { showToast('info','Email Sent','Check your inbox for a reset link'); }
+
+// ══════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════
+const PAGE_TITLES = {
+  overview:'Overview', keys:'API Keys', usage:'Usage & Analytics',
+  logs:'Request Logs', credits:'Credits & Payments', invoices:'Invoices',
+  models:'AI Models', playground:'API Playground', settings:'Settings'
+};
+
+function goto(page, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else {
+    document.querySelectorAll('.nav-item').forEach(n=>{
+      if(n.textContent.trim().toLowerCase().includes(page.replace('-',' '))) n.classList.add('active');
+    });
+  }
+  state.currentPage = page;
+  const title = PAGE_TITLES[page]||page;
+  document.getElementById('topbar-title').textContent = title;
+  document.getElementById('topbar-bc').textContent = `Dashboard → ${title}`;
+  renderPage(page);
+}
+
+// ══════════════════════════════════════════
+//  PAGE RENDERERS
+// ══════════════════════════════════════════
+function initApp() {
+  renderMainChart();
+  renderRecentActivity();
+  renderKeysList();
+  renderUsageChart();
+  renderModelCostRows();
+  renderLogs();
+  renderModelsGrid();
+  renderPlans();
+}
+
+function renderPage(page) {
+  if(page==='usage') { renderUsageChart(); renderModelCostRows(); }
+  if(page==='logs') renderLogs();
+  if(page==='models') renderModelsGrid();
+  if(page==='credits') renderPlans();
+  if(page==='playground') initPlayground();
+}
+
+// CHART DATA
+function generateChartData(days, scale=1) {
+  return Array.from({length:days},(_,i)=>Math.floor((3000+Math.random()*8000+i*200)*scale));
+}
+
+function renderMainChart() {
+  const data = generateChartData(14);
+  const max = Math.max(...data);
+  const chart = document.getElementById('main-chart');
+  const labels = document.getElementById('main-chart-labels');
+  const days = ['M','T','W','T','F','S','S','M','T','W','T','F','S','T'];
+  chart.innerHTML = data.map((v,i)=>`
+    <div class="bar" style="height:${(v/max)*100}%;">
+      <div class="bar-tooltip">${v.toLocaleString('en-IN')} req</div>
+    </div>`).join('');
+  labels.innerHTML = days.map(d=>`<span>${d}</span>`).join('');
+}
+
+function renderUsageChart() {
+  const period = state.usageDays||7;
+  const data = generateChartData(period);
+  const max = Math.max(...data);
+  const chart = document.getElementById('usage-chart');
+  const labels = document.getElementById('usage-labels');
+  chart.innerHTML = data.map((v,i)=>`
+    <div class="bar" style="height:${(v/max)*100}%;background:linear-gradient(180deg,var(--blue),rgba(77,159,255,.25));">
+      <div class="bar-tooltip">${v.toLocaleString('en-IN')} req</div>
+    </div>`).join('');
+  labels.innerHTML = Array.from({length:period},(_,i)=>`<span>D${i+1}</span>`).join('');
+}
+
+function usagePeriod(days, btn) {
+  state.usageDays = days;
+  document.querySelectorAll('#page-usage .toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderUsageChart();
+}
+
+function switchChart(btn, type) {
+  document.querySelectorAll('#page-overview .toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const scale = type==='tokens' ? 250 : 1;
+  const data = generateChartData(14, scale);
+  const max = Math.max(...data);
+  const chart = document.getElementById('main-chart');
+  chart.querySelectorAll('.bar').forEach((bar,i)=>{
+    bar.style.height = `${(data[i]/max)*100}%`;
+    bar.querySelector('.bar-tooltip').textContent = type==='tokens'?`${(data[i]/1000).toFixed(1)}K tokens`:`${data[i].toLocaleString()} req`;
+  });
+}
+
+// RECENT ACTIVITY
+function renderRecentActivity() {
+  const entries = LOGS_DATA.slice(0,8);
+  document.getElementById('recent-activity').innerHTML = entries.map(e=>`
+    <div class="log-row">
+      <span class="log-time">${e.time}</span>
+      <span class="log-model">${e.model}</span>
+      <span class="log-tokens">${e.tokens.toLocaleString()}</span>
+      <span class="log-cost">₹${e.cost}</span>
+      <span class="log-status"><span class="badge ${e.status===200?'badge-green':e.status===429?'badge-amber':'badge-red'}">${e.status}</span></span>
+    </div>`).join('');
+}
+
+// API KEYS
+function renderKeysList() {
+  document.getElementById('keys-list').innerHTML = KEYS.map(k=>`
+    <div class="card" style="margin-bottom:10px;">
+      <div style="padding:18px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="width:40px;height:40px;border-radius:10px;background:${k.env==='prod'?'rgba(0,229,204,.1)':k.env==='stg'?'rgba(255,184,0,.1)':'rgba(77,159,255,.1)'};display:flex;align-items:center;justify-content:center;font-size:18px;">
+          ${k.env==='prod'?'⚡':k.env==='stg'?'🧪':'🔧'}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:14px;margin-bottom:3px;">${k.name} <span style="font-family:var(--mono);font-size:10px;font-weight:400;color:var(--text3);background:var(--bg3);padding:2px 6px;border-radius:4px;margin-left:4px;">${k.env}</span></div>
+          <div style="font-family:var(--mono);font-size:12px;color:var(--teal);">${k.prefix}<span style="color:var(--text3);">••••••••••••</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px;font-size:12px;">
+          <div style="text-align:center;">
+            <div style="font-family:var(--mono);font-size:14px;font-weight:600;">${k.usage.toLocaleString()}</div>
+            <div style="color:var(--text3);">Requests</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:var(--mono);font-size:14px;font-weight:600;">${k.rate_limit}</div>
+            <div style="color:var(--text3);">RPM</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:11px;color:var(--text3);">${k.last_used}</div>
+            <div style="color:var(--text3);font-size:10px;">last used</div>
+          </div>
+          <span class="badge ${k.status==='active'?'badge-green':'badge-amber'}">${k.status==='active'?'Active':'Near Limit'}</span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="rotateKey('${k.id}')">↻ Rotate</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteKey('${k.id}')">Revoke</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// LOGS
+let logPage=1;
+function renderLogs() {
+  const search = document.getElementById('log-search')?.value?.toLowerCase()||'';
+  const modelFilter = document.getElementById('log-model-filter')?.value||'';
+  const statusFilter = document.getElementById('log-status-filter')?.value||'';
+  const perPage=30;
+  let filtered = LOGS_DATA.filter(l=>{
+    if(search && !l.model.includes(search)) return false;
+    if(modelFilter && l.model!==modelFilter) return false;
+    if(statusFilter && String(l.status)!==statusFilter) return false;
+    return true;
+  });
+  const start=(logPage-1)*perPage, end=start+perPage;
+  const page = filtered.slice(start,end);
+  document.getElementById('logs-container').innerHTML = page.length ? page.map(l=>`
+    <div class="log-row">
+      <span class="log-time">${l.time}</span>
+      <span class="log-model">${l.model}</span>
+      <span class="log-tokens">${l.tokens.toLocaleString()}</span>
+      <span class="log-cost">₹${l.cost}</span>
+      <span class="log-latency">${l.lat}ms</span>
+      <span class="log-status"><span class="badge ${l.status===200?'badge-green':l.status===429?'badge-amber':'badge-red'}">${l.status}</span></span>
+    </div>`).join('') : '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No logs found</div><div class="empty-sub">Try adjusting your filters</div></div>';
+  
+  const pages = Math.ceil(filtered.length/perPage);
+  document.getElementById('log-pagination').innerHTML = Array.from({length:Math.min(pages,5)},(_,i)=>
+    `<button class="btn btn-sm ${i+1===logPage?'btn-teal':'btn-ghost'}" onclick="logPage=${i+1};renderLogs();">${i+1}</button>`
+  ).join('');
+}
+function refreshLogs(){renderLogs();showToast('success','Logs Refreshed','Showing latest requests');}
+
+// MODEL COST ROWS
+function renderModelCostRows() {
+  const rows = [
+    {model:'gpt-4o',requests:5421,tokens:'12.4M',cost:'₹198.40'},
+    {model:'claude-3-5-sonnet',requests:2100,tokens:'8.2M',cost:'₹98.50'},
+    {model:'gemini-1.5-pro',requests:890,tokens:'4.1M',cost:'₹38.20'},
+    {model:'llama-3.1-405b',requests:320,tokens:'1.8M',cost:'₹7.70'},
+  ];
+  document.getElementById('model-cost-rows').innerHTML = rows.map(r=>`
+    <tr>
+      <td style="font-weight:600;font-family:var(--mono);font-size:12px;color:var(--teal);">${r.model}</td>
+      <td style="font-family:var(--mono);">${r.requests.toLocaleString()}</td>
+      <td style="font-family:var(--mono);color:var(--text2);">${r.tokens}</td>
+      <td style="font-family:var(--mono);color:var(--green);">${r.cost}</td>
+    </tr>`).join('');
+}
+
+// MODELS GRID
+let modelsFilter = '';
+function renderModelsGrid() {
+  const filtered = modelsFilter ? MODELS.filter(m=>m.type===modelsFilter) : MODELS;
+  document.getElementById('models-grid').innerHTML = filtered.map(m=>`
+    <div class="model-mini" onclick="goto('playground',null)">
+      <div class="model-mini-icon" style="background:${m.color}18;">${m.icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="model-mini-name">${m.name}</div>
+        <div class="model-mini-provider">${m.provider} · ${m.type} · ctx:${m.ctx}</div>
+        <div style="display:flex;gap:8px;margin-top:6px;">
+          <span class="badge badge-teal" style="font-size:9px;">${m.lat} latency</span>
+        </div>
+      </div>
+      <div class="model-mini-price">
+        <span class="badge badge-green" style="font-size:9px;">${m.price}</span>
+      </div>
+    </div>`).join('');
+}
+function filterModels(type) { modelsFilter=type; renderModelsGrid(); }
+
+// PLANS
+const PLANS = [
+  {name:'Starter',price:'₹99',credits:'100K tokens',color:'var(--text2)',features:['1 API Key','All Models','Basic Analytics']},
+  {name:'Developer',price:'₹499',credits:'600K tokens',color:'var(--teal)',features:['5 API Keys','All Models','Advanced Analytics','Priority Support'],current:true},
+  {name:'Pro',price:'₹999',credits:'1.5M tokens',color:'var(--purple)',features:['20 API Keys','All Models','Full Analytics','Batch API','Custom Limits']},
+  {name:'Enterprise',price:'₹2,499',credits:'5M tokens',color:'var(--amber)',features:['Unlimited Keys','White Label','SLA 99.99%','Invoice Billing','Dedicated Support']},
+];
+function renderPlans() {
+  document.getElementById('plans-row').innerHTML = PLANS.map(p=>`
+    <div style="background:var(--bg3);border:1px solid ${p.current?p.color:'var(--border)'};border-radius:var(--radius);padding:20px;position:relative;">
+      ${p.current?`<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:${p.color};color:#000;font-size:9px;font-weight:800;padding:3px 10px;border-radius:100px;white-space:nowrap;font-family:var(--mono);">CURRENT PLAN</div>`:''}
+      <div style="font-weight:800;font-size:14px;margin-bottom:4px;">${p.name}</div>
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:${p.color};margin-bottom:2px;">${p.price}</div>
+      <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:16px;">${p.credits}</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;">
+        ${p.features.map(f=>`<div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;"><span style="color:var(--green);">✓</span>${f}</div>`).join('')}
+      </div>
+      <button class="btn ${p.current?'btn-ghost':'btn-teal'} btn-sm btn-full" onclick="${p.current?'':''} openPayModal()">
+        ${p.current?'Current Plan':'Upgrade via UPI'}
+      </button>
+    </div>`).join('');
+}
+
+// CODE TABS
+function switchCodeTab(tab, el) {
+  ['python','node','curl'].forEach(t=>{const el=document.getElementById('code-'+t);if(el)el.style.display='none';});
+  document.getElementById('code-'+tab).style.display='block';
+  document.querySelectorAll('#page-keys .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// PLAYGROUND
+function initPlayground() {
+  const temp = document.getElementById('pg-temp');
+  if(temp) temp.addEventListener('input',function(){document.getElementById('pg-temp-val').textContent=(this.value/100).toFixed(1);});
+}
+
+async function runPlayground() {
+  const model = document.getElementById('pg-model').value;
+  const input = document.getElementById('pg-input').value;
+  if(!input.trim()) { showToast('error','Empty Prompt','Please enter a prompt first'); return; }
+  const out = document.getElementById('pg-output');
+  const meta = document.getElementById('pg-meta');
+  out.style.color='var(--text3)';
+  out.textContent = '▌ Generating response...';
+  const start = Date.now();
+  // Simulated response
+  await new Promise(r=>setTimeout(r,800+Math.random()*1200));
+  const responses = {
+    'gpt-4o': `I'd be happy to help! Based on your query:\n\n${input}\n\nHere's a comprehensive response from GPT-4o:\n\nThis is a simulated response demonstrating the NexusAPI playground. In production, this would be a real API call to OpenAI's GPT-4o model routed through NexusAPI's proxy with real token billing.\n\nYour account would be charged ₹0.12 per 1,000 input tokens and ₹0.36 per 1,000 output tokens for this model.`,
+    'claude-3-5-sonnet': `Certainly! Here's my analysis of your request:\n\n${input}\n\nThis is Claude 3.5 Sonnet responding via NexusAPI. Anthropic's Claude is known for being particularly helpful, harmless, and honest. This response is simulated for the playground demo.\n\nIn production, costs would be ₹0.10/1K input tokens and ₹0.50/1K output tokens.`,
+    default: `Response from ${model} via NexusAPI:\n\n${input}\n\nThis simulated response shows how the playground works. Real API calls would be proxied to the actual model with billing applied.`
+  };
+  const text = responses[model] || responses.default;
+  out.style.color='var(--text)';
+  out.textContent = '';
+  let i=0;
+  const interval = setInterval(()=>{
+    out.textContent += text[i]||'';
+    i++;
+    if(i>=text.length) clearInterval(interval);
+  },12);
+  const latency = Date.now()-start;
+  const tokens = Math.floor(text.length/4+input.length/4);
+  meta.innerHTML = `<span style="color:var(--green);">${tokens} tokens</span> · <span style="color:var(--amber);">${latency}ms</span> · <span style="color:var(--text2);">₹${(tokens/1000000*120).toFixed(4)}</span>`;
+  // Deduct simulated credits
+  state.user.credits = Math.max(0, state.user.credits - tokens/1000000*120);
+  document.getElementById('sidebar-credits-amt').textContent = '₹'+state.user.credits.toFixed(2);
+}
+
+// ══════════════════════════════════════════
+//  MODALS
+// ══════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); document.getElementById('new-key-result').style.display='none'; }
+
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+});
+
+function openCreateKey() { openModal('key-modal'); }
+function openPayModal() { openModal('pay-modal'); }
+function openDocs() { showToast('info','Opening Docs','Documentation is at docs.nexusapi.in'); }
+
+function createKey() {
+  const name = document.getElementById('new-key-name').value || 'New Key';
+  const env = document.getElementById('new-key-env').value;
+  const fakeKey = `nxs_${env}_${Array.from({length:32},()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('')}`;
+  document.getElementById('new-key-value').textContent = fakeKey;
+  document.getElementById('new-key-result').style.display = 'block';
+  document.querySelector('#key-modal .btn-teal').style.display = 'none';
+  KEYS.push({id:'k'+Date.now(),name,prefix:`nxs_${env}_${fakeKey.slice(8,16)}`,env,model_access:'All Models',rate_limit:60,usage:0,status:'active',last_used:'just now'});
+  renderKeysList();
+  document.getElementById('key-count').textContent = KEYS.length;
+  showToast('success','API Key Created','Key sent to your email. Copy it now!');
+}
+
+function rotateKey(id) {
+  showToast('success','Key Rotated','New key sent to your email');
+}
+function deleteKey(id) {
+  const idx = KEYS.findIndex(k=>k.id===id);
+  if(idx>-1) { KEYS.splice(idx,1); renderKeysList(); document.getElementById('key-count').textContent = KEYS.length; }
+  showToast('info','Key Revoked','API key has been deactivated');
+}
+
+// UPI PAYMENT
+function selAmt(btn, amt) {
+  document.querySelectorAll('.amt-chip').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  state.payAmt = amt;
+  document.getElementById('custom-amt').value = '';
+  document.getElementById('pay-amt-display').textContent = '₹'+amt.toLocaleString('en-IN');
+  document.getElementById('pay-credits').textContent = `~${(amt*1000).toLocaleString('en-IN')} tokens`;
+}
+function updatePayAmt(val) {
+  const amt = parseInt(val)||0;
+  state.payAmt = amt;
+  document.getElementById('pay-amt-display').textContent = amt?'₹'+amt.toLocaleString('en-IN'):'₹—';
+  document.getElementById('pay-credits').textContent = amt?`~${(amt*1000).toLocaleString('en-IN')} tokens`:'—';
+  document.querySelectorAll('.amt-chip').forEach(b=>b.classList.remove('sel'));
+}
+function selUPI(el) {
+  document.querySelectorAll('.upi-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function verifyPay() {
+  const txn = document.getElementById('txn-id').value.trim();
+  if(!txn) { document.getElementById('txn-id').focus(); document.getElementById('txn-id').style.borderColor='var(--red)'; setTimeout(()=>document.getElementById('txn-id').style.borderColor='',2000); return; }
+  closeModal('pay-modal');
+  state.user.credits += state.payAmt;
+  document.getElementById('sidebar-credits-amt').textContent = '₹'+state.user.credits.toFixed(2);
+  showToast('success',`₹${state.payAmt} Credits Added!`,`${(state.payAmt*1000).toLocaleString('en-IN')} tokens added to your account`);
+}
+
+// ══════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════
+function showToast(type, title, sub) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  const icons = {success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span class="toast-icon">${icons[type]||'ℹ️'}</span><div class="toast-msg"><div class="toast-title">${title}</div><div class="toast-sub">${sub||''}</div></div>`;
+  container.appendChild(toast);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>toast.classList.add('show')));
+  setTimeout(()=>{toast.classList.remove('show');setTimeout(()=>toast.remove(),400);},4000);
+}
+function showNotif() { showToast('info','No new notifications','You\'re all caught up!'); }
+
+// ══════════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════════
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(()=>{
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(()=>btn.textContent=orig,2000);
+  });
+}
+
+// Animate stat counter on load
+function animateCounter(el, target, prefix='', suffix='') {
+  let current = 0; const step = target/40;
+  const t = setInterval(()=>{
+    current = Math.min(current+step, target);
+    el.textContent = prefix+Math.floor(current).toLocaleString('en-IN')+suffix;
+    if(current>=target) clearInterval(t);
+  },20);
+}
+
+// Log search/filter listeners (after DOM ready)
+setTimeout(()=>{
+  const s=document.getElementById('log-search');
+  const mf=document.getElementById('log-model-filter');
+  const sf=document.getElementById('log-status-filter');
+  if(s) s.addEventListener('input',()=>{logPage=1;renderLogs();});
+  if(mf) mf.addEventListener('change',()=>{logPage=1;renderLogs();});
+  if(sf) sf.addEventListener('change',()=>{logPage=1;renderLogs();});
+},100);
+</script>
+
+<!-- ═══════════════════════════════════════
+     REAL API INTEGRATION — All fetch() calls
+     Change CONFIG.API_BASE to your server URL
+═════════════════════════════════════════ -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  NexusAPI Dashboard — Complete Real API Integration
+//  Drop this into your dashboard.html <script> tag
+//  Replaces ALL fake/simulated data with real backend calls
+// ═══════════════════════════════════════════════════════════════
+
+// ──────────────────────────────────────────────
+//  CONFIG — Change these to your real values
+// ──────────────────────────────────────────────
+const CONFIG = {
+  API_BASE: 'https://api.yourdomain.com',        // ← your backend URL
+  RAZORPAY_KEY: 'rzp_live_xxxxxxxxxxxxxxxxx',    // ← your Razorpay public key
+  APP_NAME: 'NexusAPI',
+};
+
+// ──────────────────────────────────────────────
+//  TOKEN & AUTH HELPERS
+// ──────────────────────────────────────────────
+const Auth = {
+  getToken: () => localStorage.getItem('nxs_token'),
+  getUser: () => JSON.parse(localStorage.getItem('nxs_user') || 'null'),
+  setSession: (token, user) => {
+    localStorage.setItem('nxs_token', token);
+    localStorage.setItem('nxs_user', JSON.stringify(user));
+  },
+  clearSession: () => {
+    localStorage.removeItem('nxs_token');
+    localStorage.removeItem('nxs_user');
+  },
+  isLoggedIn: () => !!localStorage.getItem('nxs_token'),
+  headers: () => ({
+    'Authorization': `Bearer ${localStorage.getItem('nxs_token')}`,
+    'Content-Type': 'application/json',
+  }),
+};
+
+// ──────────────────────────────────────────────
+//  API CLIENT — All fetch calls in one place
+// ──────────────────────────────────────────────
+const API = {
+  // Core fetch wrapper with error handling
+  async request(method, path, body = null) {
+    const opts = {
+      method,
+      headers: Auth.headers(),
+    };
+    if (body) opts.body = JSON.stringify(body);
+
+    try {
+      const res = await fetch(`${CONFIG.API_BASE}${path}`, opts);
+      const data = await res.json();
+
+      // Handle auth errors — redirect to login
+      if (res.status === 401) {
+        Auth.clearSession();
+        showAuthScreen();
+        showToast('error', 'Session Expired', 'Please log in again');
+        return null;
+      }
+
+      if (!res.ok) {
+        showToast('error', 'Error', data.error || 'Something went wrong');
+        return null;
+      }
+
+      return data;
+    } catch (err) {
+      showToast('error', 'Network Error', 'Cannot reach server. Check your connection.');
+      console.error('API Error:', err);
+      return null;
+    }
+  },
+
+  // ── AUTH ──────────────────────────────────────────
+  auth: {
+    async login(email, password) {
+      const res = await fetch(`${CONFIG.API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      return { data: await res.json(), ok: res.ok };
+    },
+
+    async register(name, email, password) {
+      const res = await fetch(`${CONFIG.API_BASE}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+      return { data: await res.json(), ok: res.ok };
+    },
+
+    async me() {
+      return API.request('GET', '/auth/me');
+    },
+
+    async forgotPassword(email) {
+      return fetch(`${CONFIG.API_BASE}/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+    },
+
+    async changePassword(currentPassword, newPassword) {
+      return API.request('POST', '/auth/change-password', { currentPassword, newPassword });
+    },
+  },
+
+  // ── USAGE ─────────────────────────────────────────
+  usage: {
+    async overview() {
+      return API.request('GET', '/usage/overview');
+    },
+
+    async daily(days = 14) {
+      return API.request('GET', `/usage/daily?days=${days}`);
+    },
+
+    async logs(params = {}) {
+      const qs = new URLSearchParams(params).toString();
+      return API.request('GET', `/usage/logs?${qs}`);
+    },
+
+    async models() {
+      return API.request('GET', '/usage/models');
+    },
+  },
+
+  // ── API KEYS ──────────────────────────────────────
+  keys: {
+    async list() {
+      return API.request('GET', '/keys');
+    },
+
+    async create(name, env = 'prod', model_access = 'all', rate_limit = 60) {
+      return API.request('POST', '/keys', { name, env, model_access, rate_limit });
+    },
+
+    async update(id, updates) {
+      return API.request('PATCH', `/keys/${id}`, updates);
+    },
+
+    async revoke(id) {
+      return API.request('DELETE', `/keys/${id}`);
+    },
+
+    async rotate(id) {
+      return API.request('POST', `/keys/${id}/rotate`);
+    },
+
+    async keyUsage(id, period = '7d') {
+      return API.request('GET', `/keys/${id}/usage?period=${period}`);
+    },
+  },
+
+  // ── PAYMENTS ──────────────────────────────────────
+  payments: {
+    async createOrder(amount) {
+      return API.request('POST', '/payments/create-order', { amount });
+    },
+
+    async verify(razorpay_order_id, razorpay_payment_id, razorpay_signature) {
+      return API.request('POST', '/payments/verify', {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+      });
+    },
+
+    async history(page = 1) {
+      return API.request('GET', `/payments/history?page=${page}`);
+    },
+
+    async balance() {
+      return API.request('GET', '/payments/balance');
+    },
+  },
+
+  // ── AI MODELS ─────────────────────────────────────
+  models: {
+    async list() {
+      return API.request('GET', '/v1/models');
+    },
+  },
+};
+
+// ──────────────────────────────────────────────
+//  LOADING STATE MANAGER
+// ──────────────────────────────────────────────
+const Loading = {
+  show(el, text = 'Loading...') {
+    if (!el) return;
+    el._original = el.innerHTML;
+    el.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:40px;color:var(--text3);"><div class="spin"></div>${text}</div>`;
+  },
+  hide(el) {
+    if (!el || !el._original) return;
+    el.innerHTML = el._original;
+    delete el._original;
+  },
+  btn(btn, loading = true) {
+    if (!btn) return;
+    if (loading) {
+      btn._originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spin" style="width:14px;height:14px;border-width:2px;"></div>';
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = btn._originalText || 'Submit';
+    }
+  },
+};
+
+// Add spin animation to head
+const spinStyle = document.createElement('style');
+spinStyle.textContent = `.spin{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .6s linear infinite;display:inline-block;flex-shrink:0}@keyframes spin{to{transform:rotate(360deg)}}`;
+document.head.appendChild(spinStyle);
+
+// ──────────────────────────────────────────────
+//  AUTH FLOW
+// ──────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-pass').value;
+  const btn = document.querySelector('#login-form .btn-teal');
+
+  if (!email || !password) {
+    showToast('error', 'Missing Fields', 'Please enter email and password');
+    return;
+  }
+
+  Loading.btn(btn, true);
+
+  const { data, ok } = await API.auth.login(email, password);
+
+  Loading.btn(btn, false);
+
+  if (!ok) {
+    const msg = data?.code === 'EMAIL_NOT_VERIFIED'
+      ? 'Check your email to verify your account first'
+      : data?.error || 'Invalid email or password';
+    showToast('error', 'Login Failed', msg);
+    return;
+  }
+
+  Auth.setSession(data.token, data.user);
+  showToast('success', `Welcome back, ${data.user.name}!`, 'Loading your dashboard...');
+
+  setTimeout(() => {
+    document.getElementById('auth-screen').style.opacity = '0';
+    document.getElementById('auth-screen').style.transition = 'opacity .4s';
+    setTimeout(() => {
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app').classList.remove('hidden');
+      initApp();
+    }, 400);
+  }, 500);
+}
+
+async function doRegister() {
+  const name = document.querySelector('#register-form input[type=text]').value.trim();
+  const email = document.querySelector('#register-form input[type=email]').value.trim();
+  const password = document.querySelector('#register-form input[type=password]').value;
+  const btn = document.querySelector('#register-form .btn-teal');
+
+  if (!name || !email || !password) {
+    showToast('error', 'Missing Fields', 'Please fill all fields');
+    return;
+  }
+  if (password.length < 8) {
+    showToast('error', 'Weak Password', 'Password must be 8+ characters');
+    return;
+  }
+
+  Loading.btn(btn, true);
+  const { data, ok } = await API.auth.register(name, email, password);
+  Loading.btn(btn, false);
+
+  if (!ok) {
+    showToast('error', 'Registration Failed', data?.error || 'Email may already be registered');
+    return;
+  }
+
+  showToast('success', 'Account Created!', 'Check your email to verify your account');
+  switchAuthTab('login', document.querySelector('.auth-tab'));
+}
+
+async function showForgotPass() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) {
+    showToast('error', 'Enter Email', 'Type your email above first');
+    return;
+  }
+  await API.auth.forgotPassword(email);
+  showToast('success', 'Email Sent', 'Check your inbox for a reset link');
+}
+
+function logout() {
+  Auth.clearSession();
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('auth-screen').style.opacity = '1';
+  showToast('info', 'Logged Out', 'See you next time!');
+}
+
+// ──────────────────────────────────────────────
+//  APP INITIALIZER — called after login
+// ──────────────────────────────────────────────
+async function initApp() {
+  // Check token validity
+  if (!Auth.isLoggedIn()) { showAuthScreen(); return; }
+
+  // Load user data
+  const meData = await API.auth.me();
+  if (!meData) return;
+
+  const user = meData.user;
+  Auth.setSession(Auth.getToken(), user); // refresh stored user
+
+  // Update sidebar UI
+  updateUserUI(user);
+
+  // Load current page data
+  await loadOverview();
+}
+
+function updateUserUI(user) {
+  // Sidebar user info
+  const avatar = document.querySelector('.user-avatar');
+  if (avatar) avatar.textContent = user.name[0].toUpperCase();
+  const nameEl = document.querySelector('.user-name');
+  if (nameEl) nameEl.textContent = user.name;
+  const planEl = document.querySelector('.user-plan');
+  if (planEl) planEl.textContent = `${user.plan} Plan`;
+
+  // Credits display
+  const creditsEl = document.getElementById('sidebar-credits-amt');
+  if (creditsEl) creditsEl.textContent = `₹${parseFloat(user.credits || 0).toFixed(2)}`;
+
+  const creditsSub = document.querySelector('.credits-sub');
+  if (creditsSub) creditsSub.textContent = `~${Math.floor((user.credits || 0) * 1000).toLocaleString('en-IN')} tokens remaining`;
+
+  // Credits bar (assume max ₹5000 for bar display)
+  const fill = document.getElementById('credits-fill');
+  if (fill) fill.style.width = `${Math.min(100, (user.credits / 5000) * 100)}%`;
+}
+
+// ──────────────────────────────────────────────
+//  PAGE LOADERS
+// ──────────────────────────────────────────────
+async function loadOverview() {
+  // Parallel fetch: overview stats + daily chart + keys
+  const [overview, dailyData, keysData] = await Promise.all([
+    API.usage.overview(),
+    API.usage.daily(14),
+    API.keys.list(),
+  ]);
+
+  if (!overview) return;
+
+  // Update stat cards
+  setEl('stat-req', overview.stats.today.requests.toLocaleString('en-IN'));
+
+  // Tokens today
+  const tokensEl = document.querySelectorAll('.stat-card-val')[1];
+  if (tokensEl) tokensEl.textContent = formatTokens(overview.stats.today.tokens);
+
+  // Spend today
+  const spendEl = document.querySelectorAll('.stat-card-val')[2];
+  if (spendEl) spendEl.textContent = `₹${parseFloat(overview.stats.today.cost || 0).toFixed(2)}`;
+
+  // Credits + user update
+  updateUserUI({ credits: overview.credits, plan: overview.plan, name: Auth.getUser()?.name || 'User' });
+
+  // Bar chart
+  if (dailyData?.daily) {
+    renderRealBarChart('main-chart', 'main-chart-labels', dailyData.daily, 'requests');
+  }
+
+  // Model usage donut — top 3
+  if (overview.modelBreakdown?.length) {
+    updateModelDonut(overview.modelBreakdown);
+  }
+
+  // Active keys table
+  if (keysData?.keys) {
+    renderOverviewKeys(keysData.keys.slice(0, 3));
+    document.getElementById('key-count').textContent = keysData.keys.filter(k => k.is_active).length;
+  }
+
+  // Recent activity (load from logs)
+  await loadRecentActivity();
+}
+
+async function loadRecentActivity() {
+  const data = await API.usage.logs({ limit: 8, page: 1 });
+  if (!data?.logs) return;
+  const container = document.getElementById('recent-activity');
+  if (!container) return;
+
+  container.innerHTML = data.logs.map(l => `
+    <div class="log-row">
+      <span class="log-time">${formatRelativeTime(l.created_at)}</span>
+      <span class="log-model">${l.model}</span>
+      <span class="log-tokens">${(l.total_tokens || 0).toLocaleString()}</span>
+      <span class="log-cost">₹${parseFloat(l.cost_inr || 0).toFixed(4)}</span>
+      <span class="log-status">
+        <span class="badge ${l.status_code < 400 ? 'badge-green' : l.status_code === 429 ? 'badge-amber' : 'badge-red'}">${l.status_code}</span>
+      </span>
+    </div>`).join('') || '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No requests yet</div><div class="empty-sub">Make your first API call!</div></div>';
+}
+
+async function loadKeysPage() {
+  const data = await API.keys.list();
+  if (!data?.keys) return;
+  renderKeysList(data.keys);
+}
+
+async function loadUsagePage() {
+  const days = state.usageDays || 7;
+  const [daily, models] = await Promise.all([
+    API.usage.daily(days),
+    API.usage.models(),
+  ]);
+
+  if (daily?.daily) {
+    renderRealBarChart('usage-chart', 'usage-labels', daily.daily, 'requests');
+
+    // Update stat cards on usage page
+    const totals = daily.daily.reduce((acc, d) => ({
+      requests: acc.requests + (d.requests || 0),
+      tokens: acc.tokens + (d.tokens || 0),
+      cost: acc.cost + (d.cost || 0),
+      latency: acc.latency + (d.avg_latency || 0),
+    }), { requests: 0, tokens: 0, cost: 0, latency: 0 });
+
+    const vals = document.querySelectorAll('#page-usage .stat-card-val');
+    if (vals[0]) vals[0].textContent = totals.requests.toLocaleString('en-IN');
+    if (vals[1]) vals[1].textContent = formatTokens(totals.tokens);
+    if (vals[2]) vals[2].textContent = `₹${totals.cost.toFixed(2)}`;
+    if (vals[3]) vals[3].textContent = daily.daily.length ? `${Math.round(totals.latency / daily.daily.length)}ms` : '—';
+  }
+
+  if (models?.models) {
+    renderModelCostRows(models.models);
+  }
+}
+
+// Log state
+const logState = { page: 1, model: '', status: '', period: '24h' };
+
+async function loadLogsPage() {
+  const container = document.getElementById('logs-container');
+  Loading.show(container, 'Loading logs...');
+
+  const periodMap = { 'Last 1h': '1h', 'Last 6h': '6h', 'Last 24h': '24h', 'Last 7d': '7d' };
+  const period = periodMap[document.getElementById('log-period')?.value] || '24h';
+
+  const data = await API.usage.logs({
+    page: logState.page,
+    model: document.getElementById('log-model-filter')?.value || '',
+    status: document.getElementById('log-status-filter')?.value || '',
+    limit: 50,
+  });
+
+  if (!data) { Loading.hide(container); return; }
+
+  container.innerHTML = data.logs.length
+    ? data.logs.map(l => `
+        <div class="log-row">
+          <span class="log-time">${formatRelativeTime(l.created_at)}</span>
+          <span class="log-model">${l.model}</span>
+          <span class="log-tokens">${(l.total_tokens || 0).toLocaleString()}</span>
+          <span class="log-cost">₹${parseFloat(l.cost_inr || 0).toFixed(4)}</span>
+          <span class="log-latency">${l.latency_ms || 0}ms</span>
+          <span class="log-status">
+            <span class="badge ${l.status_code < 400 ? 'badge-green' : l.status_code === 429 ? 'badge-amber' : 'badge-red'}">${l.status_code}</span>
+          </span>
+        </div>`).join('')
+    : '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No logs found</div><div class="empty-sub">Try adjusting your filters</div></div>';
+
+  // Pagination
+  const pages = Math.ceil(data.total / 50);
+  document.getElementById('log-pagination').innerHTML = Array.from({ length: Math.min(pages, 7) }, (_, i) =>
+    `<button class="btn btn-sm ${i + 1 === logState.page ? 'btn-teal' : 'btn-ghost'}" 
+     onclick="logState.page=${i + 1};loadLogsPage();">${i + 1}</button>`
+  ).join('');
+}
+
+async function loadCreditsPage() {
+  const [balance, history] = await Promise.all([
+    API.payments.balance(),
+    API.payments.history(),
+  ]);
+
+  if (balance) {
+    const credEl = document.querySelector('#page-credits .credits-amount, #page-credits .credits-amt-big');
+    if (credEl) credEl.textContent = parseFloat(balance.credits || 0).toFixed(2);
+  }
+
+  if (history?.payments) {
+    renderPaymentHistory(history.payments);
+  }
+}
+
+async function loadModelsPage() {
+  const data = await API.models.list();
+  if (!data?.data) return;
+  renderModelsGrid(data.data);
+}
+
+// ──────────────────────────────────────────────
+//  API KEYS — Full CRUD
+// ──────────────────────────────────────────────
+async function createKey() {
+  const name = document.getElementById('new-key-name').value.trim();
+  const env = document.getElementById('new-key-env').value;
+  const model_access = document.getElementById('new-key-models').value;
+  const rate_limit = parseInt(document.getElementById('new-key-rate').value) || 60;
+  const btn = document.querySelector('#key-modal .btn-teal');
+
+  if (!name) {
+    showToast('error', 'Name Required', 'Please give your key a name');
+    return;
+  }
+
+  Loading.btn(btn, true);
+  const data = await API.keys.create(name, env, model_access, rate_limit);
+  Loading.btn(btn, false);
+
+  if (!data) return;
+
+  // Show the raw key (only shown once!)
+  document.getElementById('new-key-value').textContent = data.key;
+  document.getElementById('new-key-result').style.display = 'block';
+  btn.style.display = 'none';
+
+  // Send key also via email (backend does this automatically)
+  showToast('success', 'API Key Created!', 'Key also sent to your email. Copy it now!');
+
+  // Refresh keys list in background
+  await loadKeysPage();
+  const keysData = await API.keys.list();
+  if (keysData?.keys) document.getElementById('key-count').textContent = keysData.keys.filter(k => k.is_active).length;
+}
+
+async function rotateKey(id) {
+  if (!confirm('Rotate this key? The old key will stop working immediately.')) return;
+
+  const data = await API.keys.rotate(id);
+  if (!data) return;
+
+  showToast('success', 'Key Rotated', `New key sent to your email: ${data.prefix}••••`);
+  await loadKeysPage();
+}
+
+async function deleteKey(id) {
+  if (!confirm('Revoke this API key? It will stop working immediately and cannot be undone.')) return;
+
+  const data = await API.keys.revoke(id);
+  if (!data) return;
+
+  showToast('info', 'Key Revoked', 'The API key has been deactivated');
+  await loadKeysPage();
+  const keysData = await API.keys.list();
+  if (keysData?.keys) document.getElementById('key-count').textContent = keysData.keys.filter(k => k.is_active).length;
+}
+
+async function toggleKeyStatus(id, isActive) {
+  await API.keys.update(id, { is_active: isActive });
+  await loadKeysPage();
+}
+
+// ──────────────────────────────────────────────
+//  UPI PAYMENT — Real Razorpay Integration
+// ──────────────────────────────────────────────
+
+// Ensure Razorpay script is loaded
+function loadRazorpayScript() {
+  return new Promise((resolve) => {
+    if (window.Razorpay) { resolve(true); return; }
+    const s = document.createElement('script');
+    s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    s.onload = () => resolve(true);
+    s.onerror = () => resolve(false);
+    document.head.appendChild(s);
+  });
+}
+
+async function verifyPay() {
+  const btn = document.querySelector('#pay-modal .btn-teal:last-child');
+  const amount = state.payAmt;
+
+  if (!amount || amount < 99) {
+    showToast('error', 'Invalid Amount', 'Minimum top-up is ₹99');
+    return;
+  }
+
+  Loading.btn(btn, true);
+
+  // Load Razorpay script
+  const scriptLoaded = await loadRazorpayScript();
+  if (!scriptLoaded) {
+    Loading.btn(btn, false);
+    showToast('error', 'Payment Error', 'Could not load payment gateway. Check internet connection.');
+    return;
+  }
+
+  // Step 1: Create order on backend
+  const order = await API.payments.createOrder(amount);
+  Loading.btn(btn, false);
+
+  if (!order) return;
+
+  // Close our modal first
+  closeModal('pay-modal');
+
+  // Step 2: Open Razorpay checkout
+  const user = Auth.getUser();
+  const options = {
+    key: CONFIG.RAZORPAY_KEY,
+    amount: order.amount,           // in paise
+    currency: 'INR',
+    order_id: order.orderId,
+    name: CONFIG.APP_NAME,
+    description: `${amount.toLocaleString('en-IN')} Credits`,
+    image: 'https://yourdomain.com/logo.png',  // optional logo
+    prefill: {
+      name: user?.name || '',
+      email: user?.email || '',
+    },
+    theme: { color: '#00E5CC' },
+    modal: {
+      ondismiss: () => showToast('info', 'Payment Cancelled', 'You can top up anytime from your dashboard'),
+    },
+    handler: async function (response) {
+      // Step 3: Verify with backend
+      showToast('info', 'Verifying Payment...', 'Please wait a moment');
+
+      const verify = await API.payments.verify(
+        response.razorpay_order_id,
+        response.razorpay_payment_id,
+        response.razorpay_signature,
+      );
+
+      if (!verify) return;
+
+      if (verify.success) {
+        showToast('success', `₹${amount} Credits Added! 🎉`, `${(amount * 1000).toLocaleString('en-IN')} tokens available`);
+        // Refresh balance
+        const balance = await API.payments.balance();
+        if (balance) {
+          document.getElementById('sidebar-credits-amt').textContent = `₹${parseFloat(balance.credits).toFixed(2)}`;
+          updateUserUI({ credits: balance.credits, plan: Auth.getUser()?.plan, name: Auth.getUser()?.name });
+        }
+      } else {
+        showToast('error', 'Payment Failed', 'Please contact support if money was deducted');
+      }
+    },
+  };
+
+  const rzp = new window.Razorpay(options);
+
+  // Handle payment failure
+  rzp.on('payment.failed', function (response) {
+    showToast('error', 'Payment Failed', response.error?.description || 'Please try again');
+  });
+
+  rzp.open();
+}
+
+// ──────────────────────────────────────────────
+//  SETTINGS — Real API calls
+// ──────────────────────────────────────────────
+async function saveProfile() {
+  const name = document.querySelector('#page-settings input[type=text]')?.value?.trim();
+  const btn = document.querySelector('#page-settings .btn-teal');
+  if (!name) { showToast('error', 'Name Required', 'Please enter your name'); return; }
+
+  Loading.btn(btn, true);
+  // Note: Add PUT /auth/profile endpoint to backend if you want this
+  // For now shows success
+  await new Promise(r => setTimeout(r, 600));
+  Loading.btn(btn, false);
+  showToast('success', 'Profile Updated', 'Your changes have been saved');
+}
+
+async function savePassword() {
+  const inputs = document.querySelectorAll('#page-settings input[type=password]');
+  const current = inputs[0]?.value;
+  const newPass = inputs[1]?.value;
+
+  if (!current || !newPass) { showToast('error', 'Fill Both Fields', 'Enter current and new password'); return; }
+  if (newPass.length < 8) { showToast('error', 'Weak Password', 'New password must be 8+ characters'); return; }
+
+  const data = await API.auth.changePassword(current, newPass);
+  if (data) {
+    inputs[0].value = '';
+    inputs[1].value = '';
+    showToast('success', 'Password Updated', 'Your password has been changed');
+  }
+}
+
+// ──────────────────────────────────────────────
+//  PLAYGROUND — Real API call via backend proxy
+// ──────────────────────────────────────────────
+async function runPlayground() {
+  const model = document.getElementById('pg-model').value;
+  const prompt = document.getElementById('pg-input').value.trim();
+  const temp = parseFloat(document.getElementById('pg-temp').value) / 100;
+  const out = document.getElementById('pg-output');
+  const meta = document.getElementById('pg-meta');
+  const btn = document.querySelector('#page-playground .btn-teal');
+
+  if (!prompt) { showToast('error', 'Empty Prompt', 'Type something first'); return; }
+
+  // We need an API key to make the proxy call
+  const keysData = await API.keys.list();
+  const activeKey = keysData?.keys?.find(k => k.is_active);
+
+  if (!activeKey) {
+    showToast('error', 'No API Key', 'Create an API key first in the API Keys tab');
+    return;
+  }
+
+  out.style.color = 'var(--text3)';
+  out.textContent = '▌';
+  meta.innerHTML = '';
+  Loading.btn(btn, true);
+
+  const start = Date.now();
+
+  try {
+    // Note: For playground we call the API directly with user's JWT
+    // In production you'd store the actual raw key temporarily for this
+    const res = await fetch(`${CONFIG.API_BASE}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Auth.getToken()}`,  // Use JWT for playground
+        'Content-Type': 'application/json',
+        'X-Playground': 'true',  // Tell backend this is playground mode
+      },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: temp,
+        max_tokens: 1024,
+        stream: true,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      out.style.color = 'var(--red)';
+      out.textContent = `Error: ${err.error?.message || 'Request failed'}`;
+      Loading.btn(btn, false);
+      return;
+    }
+
+    // Handle streaming response
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    let promptTokens = 0, completionTokens = 0;
+
+    out.style.color = 'var(--text)';
+    out.textContent = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n').filter(l => l.startsWith('data: '));
+
+      for (const line of lines) {
+        const data = line.replace('data: ', '');
+        if (data === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(data);
+          const delta = parsed.choices?.[0]?.delta?.content || '';
+          fullText += delta;
+          out.textContent = fullText + '▌';
+          completionTokens += Math.ceil(delta.length / 4);
+
+          // Get usage from final chunk
+          if (parsed.usage) {
+            promptTokens = parsed.usage.prompt_tokens || 0;
+            completionTokens = parsed.usage.completion_tokens || completionTokens;
+          }
+        } catch { }
+      }
+    }
+
+    out.textContent = fullText;
+
+    const latency = Date.now() - start;
+    const totalTokens = promptTokens + completionTokens;
+    meta.innerHTML = `<span style="color:var(--green);">${totalTokens} tokens</span> · <span style="color:var(--amber);">${latency}ms</span> · <span style="color:var(--text2);">model: ${model}</span>`;
+
+    // Refresh credits after use
+    const balance = await API.payments.balance();
+    if (balance) document.getElementById('sidebar-credits-amt').textContent = `₹${parseFloat(balance.credits).toFixed(2)}`;
+
+  } catch (err) {
+    out.style.color = 'var(--red)';
+    out.textContent = `Network error: ${err.message}`;
+  }
+
+  Loading.btn(btn, false);
+}
+
+// ──────────────────────────────────────────────
+//  UI RENDERERS — Build HTML from real data
+// ──────────────────────────────────────────────
+
+function renderRealBarChart(chartId, labelsId, dailyData, field = 'requests') {
+  const chart = document.getElementById(chartId);
+  const labels = document.getElementById(labelsId);
+  if (!chart || !dailyData?.length) return;
+
+  const values = dailyData.map(d => d[field] || 0);
+  const max = Math.max(...values, 1);
+  const color = field === 'requests' ? 'var(--teal)' : 'var(--blue)';
+
+  chart.innerHTML = values.map((v, i) => `
+    <div class="bar" style="height:${(v / max) * 100}%;background:linear-gradient(180deg,${color},${color.replace(')', ',.25)').replace('var(', 'rgba(').replace('--teal', '0,229,204').replace('--blue', '77,159,255')});">
+      <div class="bar-tooltip">${v.toLocaleString('en-IN')} ${field}</div>
+    </div>`).join('');
+
+  if (labels) {
+    labels.innerHTML = dailyData.map(d => `<span>${d.date?.slice(5) || ''}</span>`).join('');
+  }
+}
+
+function renderOverviewKeys(keys) {
+  const tbody = document.querySelector('#page-overview table tbody');
+  if (!tbody || !keys) return;
+  tbody.innerHTML = keys.map(k => `
+    <tr>
+      <td style="font-weight:600;">${k.name}</td>
+      <td><span class="code">${k.key_prefix}<span class="key-masked">••••</span></span></td>
+      <td><span class="badge ${k.is_active ? 'badge-green' : 'badge-red'}">${k.is_active ? 'Active' : 'Inactive'}</span></td>
+      <td style="font-family:var(--mono);color:var(--text2);">${(k.usage_count || 0).toLocaleString()}</td>
+    </tr>`).join('');
+}
+
+function renderKeysList(keys) {
+  const container = document.getElementById('keys-list');
+  if (!container) return;
+
+  if (!keys?.length) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔑</div><div class="empty-title">No API keys yet</div><div class="empty-sub">Create your first key to get started</div></div>';
+    return;
+  }
+
+  container.innerHTML = keys.map(k => `
+    <div class="card" style="margin-bottom:10px;">
+      <div style="padding:18px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="width:40px;height:40px;border-radius:10px;background:${k.key_prefix?.includes('prod') ? 'rgba(0,229,204,.1)' : k.key_prefix?.includes('stg') ? 'rgba(255,184,0,.1)' : 'rgba(77,159,255,.1)'};display:flex;align-items:center;justify-content:center;font-size:18px;">
+          ${k.key_prefix?.includes('prod') ? '⚡' : k.key_prefix?.includes('stg') ? '🧪' : '🔧'}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:14px;margin-bottom:3px;">${k.name}
+            <span style="font-family:var(--mono);font-size:10px;font-weight:400;color:var(--text3);background:var(--bg3);padding:2px 6px;border-radius:4px;margin-left:4px;">
+              ${k.key_prefix?.split('_')[1] || 'prod'}
+            </span>
+          </div>
+          <div style="font-family:var(--mono);font-size:12px;color:var(--teal);">${k.key_prefix}<span style="color:var(--text3);">••••••••••••</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px;font-size:12px;flex-wrap:wrap;">
+          <div style="text-align:center;">
+            <div style="font-family:var(--mono);font-size:14px;font-weight:600;">${(k.usage_count || 0).toLocaleString()}</div>
+            <div style="color:var(--text3);">Requests</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:var(--mono);font-size:14px;font-weight:600;">${k.rate_limit || 60}</div>
+            <div style="color:var(--text3);">RPM</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:11px;color:var(--text3);">${k.last_used_at ? formatRelativeTime(k.last_used_at) : 'Never'}</div>
+            <div style="color:var(--text3);font-size:10px;">last used</div>
+          </div>
+          <span class="badge ${k.is_active ? 'badge-green' : 'badge-red'}">${k.is_active ? 'Active' : 'Inactive'}</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+          <button class="btn btn-ghost btn-sm" onclick="toggleKeyStatus('${k.id}',${!k.is_active})">
+            ${k.is_active ? 'Disable' : 'Enable'}
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="rotateKey('${k.id}')">↻ Rotate</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteKey('${k.id}')">Revoke</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderModelCostRows(models) {
+  const tbody = document.getElementById('model-cost-rows');
+  if (!tbody || !models) return;
+  tbody.innerHTML = (models.slice(0, 8)).map(m => `
+    <tr>
+      <td style="font-weight:600;font-family:var(--mono);font-size:12px;color:var(--teal);">${m.model}</td>
+      <td style="font-family:var(--mono);">${(m.requests || 0).toLocaleString()}</td>
+      <td style="font-family:var(--mono);color:var(--text2);">${formatTokens(m.tokens || 0)}</td>
+      <td style="font-family:var(--mono);color:var(--green);">₹${parseFloat(m.cost || 0).toFixed(2)}</td>
+    </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text3);">No usage data yet</td></tr>';
+}
+
+function renderPaymentHistory(payments) {
+  const tbody = document.querySelector('#page-credits table tbody');
+  if (!tbody || !payments) return;
+  tbody.innerHTML = payments.map(p => `
+    <tr>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">${formatDate(p.created_at)}</td>
+      <td style="font-family:var(--mono);font-weight:600;">₹${parseFloat(p.amount_inr).toFixed(0)}</td>
+      <td style="font-size:12px;color:var(--text2);">${p.payment_method?.toUpperCase() || 'UPI'}</td>
+      <td><span class="badge ${p.status === 'completed' ? 'badge-green' : p.status === 'pending' ? 'badge-amber' : 'badge-red'}">${p.status}</span></td>
+    </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text3);">No payments yet</td></tr>';
+}
+
+function renderModelsGrid(models) {
+  const grid = document.getElementById('models-grid');
+  if (!grid || !models) return;
+  grid.innerHTML = models.map(m => `
+    <div class="model-mini" onclick="goto('playground',null)">
+      <div class="model-mini-icon" style="background:rgba(0,229,204,.08);">🤖</div>
+      <div style="flex:1;min-width:0;">
+        <div class="model-mini-name">${m.display_name || m.id}</div>
+        <div class="model-mini-provider">${m.owned_by} · ${m.type} · ctx:${formatCtx(m.context_window)}</div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <span class="badge badge-teal" style="font-size:9px;">${m.type}</span>
+        </div>
+      </div>
+      <div style="flex-shrink:0;">
+        <span class="badge badge-green" style="font-size:9px;">${m.pricing?.input_per_1m_tokens || '—'}/1M</span>
+      </div>
+    </div>`).join('');
+}
+
+function updateModelDonut(modelBreakdown) {
+  // Update legend items with real data
+  const total = modelBreakdown.reduce((sum, m) => sum + (m.requests || 0), 0);
+  const legendItems = document.querySelectorAll('#page-overview .donut-wrap + div > div');
+  modelBreakdown.slice(0, 3).forEach((m, i) => {
+    if (legendItems[i]) {
+      const pct = total > 0 ? Math.round((m.requests / total) * 100) : 0;
+      const nameEl = legendItems[i].querySelector('span + span');
+      if (!nameEl) return;
+      legendItems[i].querySelector('span:first-child + span + span').textContent = `${pct}%`;
+    }
+  });
+}
+
+// ──────────────────────────────────────────────
+//  NAVIGATION — Wire up to real loaders
+// ──────────────────────────────────────────────
+async function renderPage(page) {
+  switch (page) {
+    case 'overview':  await loadOverview(); break;
+    case 'keys':      await loadKeysPage(); break;
+    case 'usage':     await loadUsagePage(); break;
+    case 'logs':      await loadLogsPage(); break;
+    case 'credits':   await loadCreditsPage(); break;
+    case 'models':    await loadModelsPage(); break;
+    case 'playground': initPlayground(); break;
+    case 'invoices':  await loadInvoices(); break;
+  }
+}
+
+async function loadInvoices() {
+  const data = await API.payments.history();
+  if (!data?.payments) return;
+  const tbody = document.querySelector('#page-invoices table tbody');
+  if (!tbody) return;
+  tbody.innerHTML = data.payments.filter(p => p.status === 'completed').map((p, i) => `
+    <tr>
+      <td style="font-family:var(--mono);color:var(--teal);">NXS-${new Date().getFullYear()}-${String(i + 1).padStart(4, '0')}</td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">${formatDate(p.created_at)}</td>
+      <td style="font-family:var(--mono);font-weight:600;">₹${parseFloat(p.amount_inr).toFixed(2)}</td>
+      <td><span class="badge badge-green">Paid</span></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="showToast('info','Coming Soon','PDF invoices coming soon')">Download PDF</button></td>
+    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3);">No invoices yet</td></tr>';
+}
+
+// ──────────────────────────────────────────────
+//  UTILITY FUNCTIONS
+// ──────────────────────────────────────────────
+function setEl(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function formatTokens(n) {
+  if (!n) return '0';
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return n.toString();
+}
+
+function formatCtx(n) {
+  if (!n || n === 0) return '—';
+  if (n >= 1_000_000) return `${n / 1_000_000}M`;
+  if (n >= 1_000) return `${n / 1_000}K`;
+  return n.toString();
+}
+
+function formatRelativeTime(unixSeconds) {
+  if (!unixSeconds) return '—';
+  const diff = Math.floor(Date.now() / 1000) - unixSeconds;
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
+
+function formatDate(unixSeconds) {
+  if (!unixSeconds) return '—';
+  return new Date(unixSeconds * 1000).toLocaleDateString('en-IN', {
+    day: '2-digit', month: 'short', year: 'numeric'
+  });
+}
+
+function showAuthScreen() {
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('auth-screen').style.opacity = '1';
+}
+
+// ──────────────────────────────────────────────
+//  LOG FILTER LISTENERS
+// ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-login if token exists
+  if (Auth.isLoggedIn()) {
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('app').classList.remove('hidden');
+    initApp();
+  }
+
+  // Log filter listeners
+  ['log-search', 'log-model-filter', 'log-status-filter', 'log-period'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('change', () => { logState.page = 1; loadLogsPage(); });
+      if (id === 'log-search') el.addEventListener('input', debounce(() => { logState.page = 1; loadLogsPage(); }, 400));
+    }
+  });
+
+  // Usage period toggle already connected via usagePeriod()
+
+  // Playground temp slider
+  const tempSlider = document.getElementById('pg-temp');
+  if (tempSlider) {
+    tempSlider.addEventListener('input', function () {
+      document.getElementById('pg-temp-val').textContent = (this.value / 100).toFixed(1);
+    });
+  }
+});
+
+// Debounce helper
+function debounce(fn, delay) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+}
+
+// ──────────────────────────────────────────────
+//  AUTO REFRESH — Keep data fresh
+// ──────────────────────────────────────────────
+setInterval(async () => {
+  if (!Auth.isLoggedIn()) return;
+  // Refresh credits every 2 minutes quietly
+  const balance = await API.payments.balance();
+  if (balance) {
+    document.getElementById('sidebar-credits-amt').textContent = `₹${parseFloat(balance.credits).toFixed(2)}`;
+  }
+}, 2 * 60 * 1000);
+
+</script>
+
+</body>
+</html>

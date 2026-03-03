@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusAPI — India's AI API Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #04060f;
+  --bg1:    #070a18;
+  --bg2:    #0c1022;
+  --surf:   rgba(255,255,255,0.04);
+  --surf2:  rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.07);
+  --bd2:    rgba(77,170,255,0.2);
+  --blue:   #4DAAFF;
+  --teal:   #22D3EE;
+  --purple: #7C3AED;
+  --green:  #10B981;
+  --amber:  #F59E0B;
+  --red:    #EF4444;
+  --text:   #F0F4FF;
+  --text2:  #8899B8;
+  --text3:  #3D5070;
+  --sans:   'DM Sans', sans-serif;
+  --display:'Syne', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none;}
+
+/* ── CURSOR ───────────────────── */
+#cur{width:10px;height:10px;border-radius:50%;background:var(--blue);position:fixed;z-index:9999;pointer-events:none;mix-blend-mode:screen;}
+#cur-r{width:36px;height:36px;border-radius:50%;border:1px solid rgba(77,170,255,0.35);position:fixed;z-index:9998;pointer-events:none;transition:width .2s,height .2s,border-color .2s;}
+
+/* ── BACKGROUND ───────────────── */
+.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 0%,rgba(77,170,255,0.09) 0%,transparent 60%),
+    radial-gradient(ellipse 55% 45% at 85% 100%,rgba(124,58,237,0.1) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 35% at 50% 50%,rgba(34,211,238,0.04) 0%,transparent 60%);
+  animation:mesh 14s ease-in-out infinite alternate;
+}
+@keyframes mesh{to{filter:hue-rotate(25deg);opacity:.7;}}
+.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);
+  background-size:64px 64px;}
+
+/* ── SCROLLBAR ─────────────────── */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px;}
+
+/* ═══════════════════════════════
+   NAV
+═══════════════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:62px;
+  display:flex;align-items:center;padding:0 40px;gap:32px;
+  background:rgba(4,6,15,0.8);
+  backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:var(--display);font-size:20px;font-weight:800;letter-spacing:-.03em;
+  background:linear-gradient(135deg,var(--blue),var(--teal));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  flex-shrink:0;text-decoration:none;
+}
+.nav-logo em{-webkit-text-fill-color:var(--text2);font-style:normal;font-weight:300;}
+.nav-links{display:flex;gap:28px;align-items:center;flex:1;}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s;cursor:none;}
+.nav-links a:hover{color:var(--text);}
+.nav-right{display:flex;align-items:center;gap:10px;margin-left:auto;}
+
+/* Status pill */
+.nav-status{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:100px;
+  background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);
+  font-size:11px;color:var(--green);font-weight:600;
+}
+.status-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:9px 20px;border-radius:9px;font-size:13px;font-weight:600;
+  cursor:none;transition:all .2s;text-decoration:none;border:none;
+  font-family:var(--sans);white-space:nowrap;
+}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2);}
+.btn-ghost:hover{border-color:var(--bd2);color:var(--text);background:var(--surf);}
+.btn-blue{background:linear-gradient(135deg,var(--blue),#2563EB);color:#fff;border:none;box-shadow:0 0 20px rgba(77,170,255,0.2);}
+.btn-blue:hover{box-shadow:0 0 30px rgba(77,170,255,0.4);transform:translateY(-1px);}
+.btn-green{background:linear-gradient(135deg,var(--green),#059669);color:#fff;border:none;box-shadow:0 0 20px rgba(16,185,129,0.2);}
+.btn-green:hover{box-shadow:0 0 30px rgba(16,185,129,0.4);transform:translateY(-1px);}
+.btn-lg{padding:13px 28px;font-size:15px;border-radius:11px;}
+.btn-xl{padding:15px 36px;font-size:16px;border-radius:12px;}
+
+/* User avatar pill (shown when logged in) */
+.user-pill{
+  display:none;align-items:center;gap:8px;
+  background:var(--surf);border:1px solid var(--border);
+  border-radius:100px;padding:5px 14px 5px 6px;cursor:none;
+  transition:border-color .2s;
+}
+.user-pill:hover{border-color:var(--bd2);}
+.user-pill.show{display:flex;}
+.pill-avatar{
+  width:26px;height:26px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--teal));
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;color:#000;
+}
+.pill-name{font-size:13px;font-weight:600;}
+.pill-credits{font-size:11px;color:var(--green);font-family:monospace;font-weight:600;}
+
+/* ═══════════════════════════════
+   HERO
+═══════════════════════════════ */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:120px 40px 80px;text-align:center;position:relative;z-index:1;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(77,170,255,0.08);border:1px solid rgba(77,170,255,0.2);
+  border-radius:100px;padding:6px 16px;margin-bottom:32px;
+  font-size:12px;color:var(--blue);font-weight:600;letter-spacing:.02em;
+  animation:fadeUp .6s ease forwards;opacity:0;
+}
+.hero-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.hero h1{
+  font-family:var(--display);
+  font-size:clamp(44px,7.5vw,100px);
+  font-weight:800;line-height:.95;letter-spacing:-.04em;
+  margin-bottom:24px;
+}
+.h1-line1{display:block;color:var(--text);animation:fadeUp .7s .1s ease forwards;opacity:0;}
+.h1-line2{
+  display:block;
+  background:linear-gradient(130deg,var(--blue) 0%,var(--teal) 45%,var(--purple) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-size:200% 100%;
+  animation:shimmer 5s linear infinite,fadeUp .7s .15s ease forwards;
+  opacity:0;
+}
+@keyframes shimmer{0%{background-position:0 0}100%{background-position:200% 0}}
+
+.hero-sub{
+  max-width:540px;margin:0 auto 40px;
+  font-size:18px;line-height:1.75;color:var(--text2);font-weight:300;
+  animation:fadeUp .7s .2s ease forwards;opacity:0;
+}
+.hero-sub strong{color:var(--text);font-weight:500;}
+
+.hero-cta{
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  animation:fadeUp .7s .3s ease forwards;opacity:0;margin-bottom:56px;
+}
+.hero-cta .btn-xl{font-size:15px;padding:14px 32px;}
+
+.hero-stats{
+  display:flex;gap:40px;justify-content:center;flex-wrap:wrap;
+  animation:fadeUp .7s .4s ease forwards;opacity:0;
+}
+.hstat{text-align:center;}
+.hstat-n{
+  font-family:var(--display);font-size:30px;font-weight:800;display:block;
+  background:linear-gradient(135deg,var(--text),var(--text2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hstat-l{font-size:12px;color:var(--text3);margin-top:3px;}
+.hstat-sep{width:1px;background:var(--border);align-self:stretch;}
+
+/* ── TICKER ───────────────────── */
+.ticker-wrap{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,0.02);overflow:hidden;white-space:nowrap;padding:13px 0;
+}
+.ticker-wrap::before,.ticker-wrap::after{
+  content:'';position:absolute;top:0;bottom:0;width:120px;z-index:2;
+}
+.ticker-wrap::before{left:0;background:linear-gradient(90deg,var(--bg),transparent);}
+.ticker-wrap::after{right:0;background:linear-gradient(-90deg,var(--bg),transparent);}
+.ticker-inner{display:inline-flex;gap:48px;animation:ticker 28s linear infinite;}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tick{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);font-weight:500;}
+.tick-badge{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;}
+.tb-blue{background:rgba(77,170,255,0.12);color:var(--blue);}
+.tb-purple{background:rgba(124,58,237,0.12);color:#A78BFA;}
+.tb-green{background:rgba(16,185,129,0.12);color:var(--green);}
+.tb-amber{background:rgba(245,158,11,0.12);color:var(--amber);}
+
+/* ═══════════════════════════════
+   SECTIONS
+═══════════════════════════════ */
+section{position:relative;z-index:1;}
+.section-header{text-align:center;margin-bottom:60px;}
+.section-eyebrow{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--blue);margin-bottom:14px;}
+.section-title{font-family:var(--display);font-size:clamp(30px,4vw,50px);font-weight:800;letter-spacing:-.025em;margin-bottom:14px;line-height:1.05;}
+.section-sub{font-size:16px;color:var(--text2);max-width:460px;margin:0 auto;line-height:1.75;}
+
+/* ═══════════════════════════════
+   MODELS GRID
+═══════════════════════════════ */
+.models-section{padding:100px 40px;}
+.model-filter{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;}
+.mfbtn{
+  padding:7px 18px;border-radius:100px;font-size:13px;font-weight:600;
+  border:1px solid var(--border);background:transparent;color:var(--text2);
+  cursor:none;transition:all .15s;font-family:var(--sans);
+}
+.mfbtn.on,.mfbtn:hover{border-color:var(--blue);color:var(--blue);background:rgba(77,170,255,0.08);}
+.models-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;max-width:1200px;margin:0 auto;}
+.model-card{
+  background:var(--surf);border:1px solid var(--border);border-radius:14px;
+  padding:24px;position:relative;overflow:hidden;transition:all .25s;cursor:none;
+}
+.model-card::after{
+  content:'';position:absolute;inset:-1px;border-radius:15px;
+  background:linear-gradient(135deg,var(--blue),var(--purple),var(--teal));
+  opacity:0;transition:opacity .25s;z-index:-1;
+}
+.model-card:hover{transform:translateY(-3px);border-color:transparent;}
+.model-card:hover::after{opacity:.15;}
+.mc-glow{position:absolute;top:-10px;right:-10px;width:100px;height:100px;border-radius:50%;filter:blur(30px);opacity:.12;transition:opacity .25s;}
+.model-card:hover .mc-glow{opacity:.25;}
+.mc-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.mc-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.mc-info{flex:1;margin-left:12px;}
+.mc-name{font-family:var(--display);font-size:15px;font-weight:700;margin-bottom:2px;}
+.mc-provider{font-size:11px;color:var(--text3);}
+.mc-price{
+  background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.18);
+  color:var(--green);border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;white-space:nowrap;
+}
+.mc-desc{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:16px;}
+.mc-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px;}
+.mc-tag{padding:3px 9px;border-radius:5px;font-size:10px;font-weight:600;background:var(--surf2);color:var(--text2);border:1px solid var(--border);}
+.mc-stats{display:flex;gap:16px;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:16px;}
+.mcs{flex:1;text-align:center;}
+.mcs-v{font-size:13px;font-weight:700;font-family:monospace;}
+.mcs-k{font-size:10px;color:var(--text3);margin-top:1px;}
+.mc-foot{display:flex;gap:8px;}
+.mc-foot .btn{flex:1;justify-content:center;font-size:13px;padding:9px 0;}
+
+/* ═══════════════════════════════
+   PRICING
+═══════════════════════════════ */
+.pricing-section{padding:100px 40px;}
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:1100px;margin:0 auto;}
+.plan-card{
+  background:var(--surf);border:1px solid var(--border);border-radius:18px;
+  padding:32px;position:relative;overflow:hidden;transition:all .25s;cursor:none;
+}
+.plan-card.pop{border-color:var(--blue);background:rgba(77,170,255,0.05);}
+.plan-card.pop::before{
+  content:'MOST POPULAR';position:absolute;top:14px;right:14px;
+  background:linear-gradient(135deg,var(--blue),#2563EB);color:#fff;
+  font-size:9px;font-weight:800;letter-spacing:.1em;padding:3px 10px;border-radius:100px;
+}
+.plan-card:hover{transform:translateY(-5px);box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.plan-name{font-family:var(--display);font-size:18px;font-weight:800;margin-bottom:6px;}
+.plan-price{font-family:var(--display);font-size:42px;font-weight:800;line-height:1;margin-bottom:4px;}
+.plan-price .cur{font-size:22px;vertical-align:top;margin-top:6px;display:inline-block;}
+.plan-price .per{font-size:14px;color:var(--text3);font-weight:400;}
+.plan-tokens{font-size:13px;color:var(--blue);margin-bottom:22px;font-weight:500;}
+.plan-feats{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.plan-feats li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2);line-height:1.5;}
+.plan-feats li::before{content:'✓';color:var(--green);font-weight:800;flex-shrink:0;margin-top:1px;}
+.plan-btn{width:100%;justify-content:center;font-size:14px;padding:12px;}
+
+/* ═══════════════════════════════
+   HOW IT WORKS
+═══════════════════════════════ */
+.how-section{padding:100px 40px;}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;max-width:900px;margin:0 auto;}
+.step{padding:32px 28px;text-align:center;}
+.step-circle{
+  width:72px;height:72px;border-radius:50%;margin:0 auto 20px;
+  background:var(--surf2);border:1px solid var(--bd2);
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  position:relative;
+}
+.step-n{
+  position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;
+  background:var(--blue);color:#000;font-size:10px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;font-family:var(--display);
+}
+.step-title{font-family:var(--display);font-size:17px;font-weight:700;margin-bottom:8px;}
+.step-desc{font-size:13px;color:var(--text2);line-height:1.7;}
+
+/* Code block */
+.code-card{
+  max-width:680px;margin:48px auto 0;
+  background:var(--surf);border:1px solid var(--border);border-radius:14px;overflow:hidden;
+}
+.code-header{background:rgba(255,255,255,0.03);padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+.code-dot{width:10px;height:10px;border-radius:50%;}
+.code-fn{font-size:12px;color:var(--text3);margin-left:8px;font-family:monospace;}
+.code-body{padding:24px 28px;font-family:monospace;font-size:13px;line-height:1.9;overflow-x:auto;}
+.c-comment{color:#3D5070;}
+.c-kw{color:#A78BFA;}
+.c-str{color:var(--teal);}
+.c-fn{color:var(--amber);}
+.c-num{color:var(--blue);}
+
+/* ═══════════════════════════════
+   SOCIAL PROOF
+═══════════════════════════════ */
+.proof-section{padding:80px 40px;}
+.proof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;max-width:1000px;margin:0 auto;}
+.proof-card{
+  background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:24px;
+  position:relative;
+}
+.proof-stars{color:var(--amber);font-size:13px;margin-bottom:12px;}
+.proof-text{font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:16px;}
+.proof-author{display:flex;align-items:center;gap:10px;}
+.proof-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#000;flex-shrink:0;}
+.proof-name{font-size:13px;font-weight:700;}
+.proof-role{font-size:11px;color:var(--text3);}
+
+/* ═══════════════════════════════
+   FOOTER
+═══════════════════════════════ */
+footer{border-top:1px solid var(--border);padding:56px 40px 40px;position:relative;z-index:1;}
+.footer-grid{display:grid;grid-template-columns:2fr repeat(3,1fr);gap:48px;max-width:1100px;margin:0 auto 48px;}
+.footer-logo{font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block;margin-bottom:12px;text-decoration:none;}
+.footer-logo em{-webkit-text-fill-color:var(--text2);font-style:normal;font-weight:300;}
+.footer-desc{font-size:13px;color:var(--text3);line-height:1.75;max-width:260px;}
+.footer-col h4{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:14px;}
+.footer-col a{display:block;font-size:13px;color:var(--text3);text-decoration:none;margin-bottom:9px;transition:color .15s;}
+.footer-col a:hover{color:var(--text);}
+.footer-bottom{max-width:1100px;margin:0 auto;border-top:1px solid var(--border);padding-top:28px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text3);}
+.footer-pills{display:flex;gap:8px;}
+.footer-pill{background:var(--surf);border:1px solid var(--border);border-radius:5px;padding:3px 10px;font-size:10px;font-weight:700;color:var(--text3);}
+
+/* ═══════════════════════════════
+   LOGIN / REGISTER MODAL
+═══════════════════════════════ */
+.modal-bg{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(4,6,15,0.85);backdrop-filter:blur(16px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.modal-bg.open{opacity:1;pointer-events:all;}
+.auth-modal{
+  background:var(--bg1);border:1px solid rgba(77,170,255,0.2);
+  border-radius:20px;width:420px;max-width:95vw;
+  transform:translateY(20px) scale(.97);transition:transform .28s cubic-bezier(.34,1.4,.64,1);
+  box-shadow:0 0 80px rgba(77,170,255,0.1);overflow:hidden;position:relative;
+}
+.modal-bg.open .auth-modal{transform:translateY(0) scale(1);}
+
+/* Auth modal glow top */
+.auth-modal::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--blue),var(--teal),transparent);
+}
+.am-head{padding:28px 28px 0;}
+.am-logo{font-family:var(--display);font-size:20px;font-weight:800;margin-bottom:4px;}
+.am-logo .t{color:var(--blue);}
+.am-logo .w{color:var(--text2);font-weight:300;}
+.am-sub{font-size:13px;color:var(--text3);margin-bottom:24px;}
+.am-trigger-msg{
+  background:rgba(77,170,255,0.08);border:1px solid rgba(77,170,255,0.2);
+  border-radius:9px;padding:10px 14px;margin-bottom:20px;
+  font-size:12px;color:var(--blue);display:none;align-items:center;gap:8px;
+}
+.am-trigger-msg.show{display:flex;}
+.am-tabs{display:flex;background:var(--bg2);border-radius:8px;padding:3px;margin-bottom:24px;}
+.am-tab{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:600;border-radius:6px;cursor:none;transition:all .2s;color:var(--text3);}
+.am-tab.on{background:var(--bg2);color:var(--text);box-shadow:0 0 0 1px var(--border);background:rgba(255,255,255,.06);}
+.am-body{padding:0 28px 28px;}
+.form-g{margin-bottom:16px;}
+.form-l{display:block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+.form-inp{
+  width:100%;background:var(--bg2);border:1px solid var(--border);
+  border-radius:9px;padding:11px 13px;color:var(--text);
+  font-family:var(--sans);font-size:14px;outline:none;transition:border-color .2s;
+}
+.form-inp:focus{border-color:var(--blue);}
+.form-inp::placeholder{color:var(--text3);}
+.form-row{display:flex;justify-content:flex-end;margin:-8px 0 12px;}
+.form-link{font-size:12px;color:var(--text3);cursor:none;text-decoration:none;transition:color .15s;}
+.form-link:hover{color:var(--text);}
+.am-submit{width:100%;padding:13px;font-size:15px;border-radius:10px;margin-top:4px;letter-spacing:.01em;}
+.am-divider{text-align:center;color:var(--text3);font-size:11px;margin:16px 0;position:relative;}
+.am-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border);}
+.am-divider span{position:relative;background:var(--bg1);padding:0 12px;}
+.am-alt{text-align:center;font-size:12px;color:var(--text3);margin-top:14px;}
+.am-close{
+  position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:7px;
+  background:var(--surf);border:1px solid var(--border);color:var(--text2);
+  cursor:none;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.am-close:hover{color:var(--text);background:var(--surf2);}
+
+/* Toast */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:8px;}
+.toast{
+  background:var(--bg1);border:1px solid var(--border);border-radius:10px;
+  padding:12px 16px;display:flex;align-items:center;gap:10px;min-width:270px;
+  transform:translateX(110%);transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+}
+.toast.show{transform:translateX(0);}
+.toast.ok{border-color:rgba(16,185,129,.25);}
+.toast.err{border-color:rgba(239,68,68,.25);}
+.toast.info{border-color:rgba(77,170,255,.25);}
+.toast-ico{font-size:16px;}
+.toast-title{font-size:13px;font-weight:700;}
+.toast-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+
+/* Spin */
+.spin{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:sp .6s linear infinite;display:inline-block;}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Reveal on scroll */
+.reveal{opacity:0;transform:translateY(24px);transition:all .6s ease;}
+.reveal.in{opacity:1;transform:translateY(0);}
+.rd1{transition-delay:.1s;}.rd2{transition-delay:.2s;}.rd3{transition-delay:.3s;}
+
+/* Responsive */
+@media(max-width:768px){
+  nav{padding:0 16px;gap:0;}
+  .nav-links{display:none;}
+  .hero{padding:100px 20px 60px;}
+  .models-grid,.plans-grid,.proof-grid{grid-template-columns:1fr;}
+  .footer-grid{grid-template-columns:1fr;gap:28px;}
+  .steps{grid-template-columns:1fr 1fr;}
+  section{padding-left:20px!important;padding-right:20px!important;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-r"></div>
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
+
+<!-- ════════════════════════════════
+     NAV
+════════════════════════════════ -->
+<nav>
+  <a class="nav-logo" href="#">Nexus<em>API</em></a>
+  <div class="nav-links">
+    <a href="#models">Models</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#how">How it works</a>
+    <a href="#docs">Docs</a>
+  </div>
+
+  <!-- Status pill -->
+  <div class="nav-right">
+    <div class="nav-status">
+      <span class="status-dot"></span>
+      All systems live
+    </div>
+
+    <!-- Shown when NOT logged in -->
+    <div id="nav-auth-btns">
+      <a href="#" class="btn btn-ghost" onclick="openAuth('login',null,event)">Log in</a>
+      <a href="#pricing" class="btn btn-blue" onclick="openAuth('register','get-started',event)" style="margin-left:8px;">Get Started →</a>
+    </div>
+
+    <!-- Shown when logged in -->
+    <div class="user-pill" id="user-pill" onclick="goToDashboard()">
+      <div class="pill-avatar" id="pill-av">R</div>
+      <div>
+        <div class="pill-name" id="pill-name">Rahul</div>
+        <div class="pill-credits" id="pill-credits">₹847.50</div>
+      </div>
+    </div>
+
+    <!-- Dashboard btn (logged in) -->
+    <a href="dashboard.html" class="btn btn-blue" id="dash-btn" style="display:none;margin-left:8px;">Dashboard →</a>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════
+     HERO
+════════════════════════════════ -->
+<section class="hero" id="home">
+  <div class="hero-eyebrow">
+    <span class="dot"></span>
+    Live on Polygon · UPI Payments · Instant API Access
+  </div>
+  <h1>
+    <span class="h1-line1">One API Key.</span>
+    <span class="h1-line2">Every AI Model.</span>
+  </h1>
+  <p class="hero-sub">
+    Access <strong>GPT-4o, Claude, Gemini, Llama</strong> and 50+ AI models through one unified API.
+    Pay with <strong>UPI in ₹</strong> — no international cards needed.
+  </p>
+  <div class="hero-cta">
+    <a href="#pricing" class="btn btn-green btn-xl" onclick="handlePurchaseClick(event)">
+      ⚡ Buy Credits with UPI
+    </a>
+    <a href="#models" class="btn btn-ghost btn-xl">
+      Explore Models →
+    </a>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat"><span class="hstat-n">50+</span><div class="hstat-l">AI Models</div></div>
+    <div class="hstat-sep"></div>
+    <div class="hstat"><span class="hstat-n">₹0.001</span><div class="hstat-l">Starting Price</div></div>
+    <div class="hstat-sep"></div>
+    <div class="hstat"><span class="hstat-n">99.9%</span><div class="hstat-l">Uptime SLA</div></div>
+    <div class="hstat-sep"></div>
+    <div class="hstat"><span class="hstat-n">10K+</span><div class="hstat-l">Developers</div></div>
+  </div>
+</section>
+
+<!-- ── Ticker ─── -->
+<div class="ticker-wrap" style="position:relative;z-index:1;">
+  <div class="ticker-inner" id="ticker"></div>
+</div>
+
+<!-- ════════════════════════════════
+     MODELS
+════════════════════════════════ -->
+<section class="models-section" id="models">
+  <div class="section-header">
+    <div class="section-eyebrow reveal">🤖 Model Marketplace</div>
+    <h2 class="section-title reveal rd1">Every Top AI Model,<br>One Platform</h2>
+    <p class="section-sub reveal rd2">From GPT-4o to open-source Llama. All priced in ₹, billed per token.</p>
+  </div>
+  <div class="model-filter reveal">
+    <button class="mfbtn on" onclick="filterModels('all',this)">All Models</button>
+    <button class="mfbtn" onclick="filterModels('chat',this)">Chat</button>
+    <button class="mfbtn" onclick="filterModels('code',this)">Code</button>
+    <button class="mfbtn" onclick="filterModels('vision',this)">Vision</button>
+    <button class="mfbtn" onclick="filterModels('embedding',this)">Embeddings</button>
+    <button class="mfbtn" onclick="filterModels('image',this)">Image Gen</button>
+  </div>
+  <div class="models-grid" id="models-grid"></div>
+</section>
+
+<!-- ════════════════════════════════
+     PROOF
+════════════════════════════════ -->
+<section class="proof-section">
+  <div class="section-header">
+    <div class="section-eyebrow reveal">💬 What developers say</div>
+    <h2 class="section-title reveal rd1">Trusted by builders<br>across India</h2>
+  </div>
+  <div class="proof-grid">
+    <div class="proof-card reveal">
+      <div class="proof-stars">★★★★★</div>
+      <p class="proof-text">"Finally an AI API platform that accepts UPI! No more struggling with international cards. Integrated in under 10 minutes."</p>
+      <div class="proof-author">
+        <div class="proof-avatar" style="background:linear-gradient(135deg,#4DAAFF,#22D3EE);">A</div>
+        <div><div class="proof-name">Arjun Mehta</div><div class="proof-role">Founder @ TechStartup, Bangalore</div></div>
+      </div>
+    </div>
+    <div class="proof-card reveal rd1">
+      <div class="proof-stars">★★★★★</div>
+      <p class="proof-text">"The pricing is very competitive. I'm running Llama 3.1 for my chatbot at a fraction of what OpenAI would cost me."</p>
+      <div class="proof-author">
+        <div class="proof-avatar" style="background:linear-gradient(135deg,#7C3AED,#EC4899);">P</div>
+        <div><div class="proof-name">Priya Nair</div><div class="proof-role">ML Engineer, Chennai</div></div>
+      </div>
+    </div>
+    <div class="proof-card reveal rd2">
+      <div class="proof-stars">★★★★★</div>
+      <p class="proof-text">"OpenAI-compatible API means zero code changes. Just swap the base URL and API key. Works perfectly."</p>
+      <div class="proof-author">
+        <div class="proof-avatar" style="background:linear-gradient(135deg,#10B981,#3B82F6);">R</div>
+        <div><div class="proof-name">Rohan Gupta</div><div class="proof-role">Solo Developer, Mumbai</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     PRICING
+════════════════════════════════ -->
+<section class="pricing-section" id="pricing">
+  <div class="section-header">
+    <div class="section-eyebrow reveal">💳 Simple Pricing</div>
+    <h2 class="section-title reveal rd1">Pay in ₹ via UPI.<br>No Surprises.</h2>
+    <p class="section-sub reveal rd2">Buy credits once, use across all 50+ models. Credits never expire.</p>
+  </div>
+  <div class="plans-grid" id="plans-grid"></div>
+
+  <!-- Per-token pricing table -->
+  <div style="max-width:700px;margin:48px auto 0;" class="reveal">
+    <div style="background:var(--surf);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+      <div style="padding:16px 24px;border-bottom:1px solid var(--border);font-family:var(--display);font-size:14px;font-weight:700;">Per-token pricing (₹ per 1M tokens)</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:rgba(255,255,255,0.02);">
+            <th style="text-align:left;padding:10px 24px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Model</th>
+            <th style="text-align:right;padding:10px 16px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Input</th>
+            <th style="text-align:right;padding:10px 24px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Output</th>
+          </tr>
+        </thead>
+        <tbody id="price-table"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     HOW IT WORKS
+════════════════════════════════ -->
+<section class="how-section" id="how">
+  <div class="section-header">
+    <div class="section-eyebrow reveal">⚡ Quick Start</div>
+    <h2 class="section-title reveal rd1">Live in 2 minutes</h2>
+  </div>
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-circle">🔑<span class="step-n">1</span></div>
+      <div class="step-title">Create Account</div>
+      <p class="step-desc">Sign up with your email. No credit card needed to start.</p>
+    </div>
+    <div class="step reveal rd1">
+      <div class="step-circle">📱<span class="step-n">2</span></div>
+      <div class="step-title">Pay via UPI</div>
+      <p class="step-desc">Top up with GPay, PhonePe, Paytm or any UPI app. Instant.</p>
+    </div>
+    <div class="step reveal rd2">
+      <div class="step-circle">⚡<span class="step-n">3</span></div>
+      <div class="step-title">Get API Key</div>
+      <p class="step-desc">One key unlocks all 50+ AI models instantly.</p>
+    </div>
+    <div class="step reveal rd3">
+      <div class="step-circle">🚀<span class="step-n">4</span></div>
+      <div class="step-title">Start Building</div>
+      <p class="step-desc">OpenAI-compatible. Drop in your existing code.</p>
+    </div>
+  </div>
+  <div class="code-card reveal" id="docs">
+    <div class="code-header">
+      <div class="code-dot" style="background:#FF5F57;"></div>
+      <div class="code-dot" style="background:#FFBD2E;"></div>
+      <div class="code-dot" style="background:#28CA41;"></div>
+      <span class="code-fn">quickstart.py</span>
+    </div>
+    <div class="code-body">
+<span class="c-comment"># Works with existing OpenAI code — zero changes!</span>
+<span class="c-kw">import</span> openai
+
+client = openai.<span class="c-fn">OpenAI</span>(
+    api_key=<span class="c-str">"nxs_prod_your_key_here"</span>,
+    base_url=<span class="c-str">"https://api.nexusapi.in/v1"</span>
+)
+
+response = client.chat.completions.<span class="c-fn">create</span>(
+    model=<span class="c-str">"gpt-4o"</span>,  <span class="c-comment"># or claude-3-5, gemini-pro, llama-3.1...</span>
+    messages=[{<span class="c-str">"role"</span>: <span class="c-str">"user"</span>, <span class="c-str">"content"</span>: <span class="c-str">"Hello!"</span>}]
+)
+
+<span class="c-fn">print</span>(response.choices[<span class="c-num">0</span>].message.content)
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     FOOTER
+════════════════════════════════ -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a class="footer-logo" href="#">Nexus<em>API</em></a>
+      <p class="footer-desc">India's AI API marketplace. Unified access to 50+ models, paid with UPI. Built for Indian developers.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Models</h4>
+      <a href="#models">GPT-4o</a>
+      <a href="#models">Claude 3.5</a>
+      <a href="#models">Gemini Pro</a>
+      <a href="#models">Llama 3.1</a>
+      <a href="#models">View All 50+</a>
+    </div>
+    <div class="footer-col">
+      <h4>Developers</h4>
+      <a href="#docs">Documentation</a>
+      <a href="#docs">API Reference</a>
+      <a href="#docs">SDKs</a>
+      <a href="#docs">Status Page</a>
+      <a href="#docs">Changelog</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#">About</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#">Blog</a>
+      <a href="#">Contact</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 NexusAPI. Built with ❤️ for Indian developers.</div>
+    <div class="footer-pills">
+      <span class="footer-pill">🔒 SSL</span>
+      <span class="footer-pill">🇮🇳 India Servers</span>
+      <span class="footer-pill">⚡ 99.9% Uptime</span>
+      <span class="footer-pill">🚫 No Ads</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════
+     AUTH MODAL (Login / Register)
+     Slides in from corner, never blocks page
+════════════════════════════════ -->
+<div class="modal-bg" id="auth-modal" onclick="handleModalBgClick(event)">
+  <div class="auth-modal">
+    <button class="am-close" onclick="closeAuth()">×</button>
+    <div class="am-head">
+      <div class="am-logo"><span class="t">Nexus</span><span class="w">API</span></div>
+      <div class="am-sub" id="am-sub">Welcome back</div>
+      <!-- Shown when user clicks a purchase button -->
+      <div class="am-trigger-msg" id="am-trigger">
+        🔒 Log in to purchase credits and get your API key
+      </div>
+      <div class="am-tabs">
+        <div class="am-tab on" id="tab-login" onclick="switchTab('login')">Sign In</div>
+        <div class="am-tab" id="tab-register" onclick="switchTab('register')">Create Account</div>
+      </div>
+    </div>
+    <div class="am-body">
+
+      <!-- LOGIN FORM -->
+      <div id="form-login">
+        <div class="form-g">
+          <label class="form-l">Email</label>
+          <input class="form-inp" type="email" id="l-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="form-g">
+          <label class="form-l">Password</label>
+          <input class="form-inp" type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"
+            onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div class="form-row">
+          <a href="#" class="form-link" onclick="showForgotPass(event)">Forgot password?</a>
+        </div>
+        <button class="btn btn-blue btn-xl am-submit" id="login-btn" onclick="doLogin()">Sign In →</button>
+        <div class="am-divider"><span>New to NexusAPI?</span></div>
+        <div class="am-alt">
+          <a href="#" onclick="switchTab('register')" class="form-link" style="color:var(--blue);">Create a free account →</a>
+        </div>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="form-register" style="display:none;">
+        <div class="form-g">
+          <label class="form-l">Full Name</label>
+          <input class="form-inp" type="text" id="r-name" placeholder="Rahul Sharma" autocomplete="name">
+        </div>
+        <div class="form-g">
+          <label class="form-l">Email</label>
+          <input class="form-inp" type="email" id="r-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="form-g">
+          <label class="form-l">Password</label>
+          <input class="form-inp" type="password" id="r-pass" placeholder="8+ characters" autocomplete="new-password"
+            onkeydown="if(event.key==='Enter')doRegister()">
+        </div>
+        <button class="btn btn-blue btn-xl am-submit" id="reg-btn" onclick="doRegister()">Create Account →</button>
+        <div class="am-alt" style="margin-top:16px;font-size:11px;color:var(--text3);">
+          By signing up you agree to our <a href="#" class="form-link">Terms</a> and <a href="#" class="form-link">Privacy Policy</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- ════════════════════════════════
+     SCRIPT
+════════════════════════════════ -->
+<script>
+// ─── CONFIG ──────────────────────────────────
+const API_BASE = 'https://api.yourdomain.com'; // ← change to your backend
+const SESSION_KEY = 'nxs_session';
+
+// ─── SESSION HELPERS ─────────────────────────
+const Session = {
+  get: () => JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'),
+  set: (d) => localStorage.setItem(SESSION_KEY, JSON.stringify(d)),
+  clear: () => localStorage.removeItem(SESSION_KEY),
+  isLoggedIn: () => !!localStorage.getItem(SESSION_KEY),
+};
+
+// ─── CURSOR ──────────────────────────────────
+const cur = document.getElementById('cur');
+const curR = document.getElementById('cur-r');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => {
+  mx=e.clientX; my=e.clientY;
+  cur.style.transform = `translate(${mx-5}px,${my-5}px)`;
+});
+(function raf(){ rx+=(mx-rx-18)*.11; ry+=(my-ry-18)*.11;
+  curR.style.transform=`translate(${rx}px,${ry}px)`; requestAnimationFrame(raf); })();
+document.querySelectorAll('a,button,.model-card,.plan-card,.mfbtn,.am-tab,.upi-opt').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ curR.style.width='56px'; curR.style.height='56px'; curR.style.borderColor='rgba(77,170,255,.6)'; });
+  el.addEventListener('mouseleave',()=>{ curR.style.width='36px'; curR.style.height='36px'; curR.style.borderColor='rgba(77,170,255,.35)'; });
+});
+
+// ─── SCROLL REVEAL ───────────────────────────
+const revealObs = new IntersectionObserver(entries =>
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); }), {threshold:.12});
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// ─── DATA ────────────────────────────────────
+const MODELS = [
+  {id:'gpt-4o',name:'GPT-4o',provider:'OpenAI',icon:'🧠',color:'#10A37F',price:'₹120/1M in',desc:'Most capable multimodal model with vision, function calling and 128K context.',tags:['Chat','Vision','128K Context','Functions'],lat:'~1.2s',ctx:'128K',rpm:'10K',type:['chat','vision']},
+  {id:'claude-3-5-sonnet',name:'Claude 3.5 Sonnet',provider:'Anthropic',icon:'⚡',color:'#CC785C',price:'₹100/1M in',desc:'Exceptional at coding, reasoning and analysis. 200K context window.',tags:['Chat','Code','200K Context'],lat:'~0.9s',ctx:'200K',rpm:'8K',type:['chat','code']},
+  {id:'gemini-1.5-pro',name:'Gemini 1.5 Pro',provider:'Google',icon:'💎',color:'#4285F4',price:'₹80/1M in',desc:'Google\'s flagship with an industry-leading 2M context window.',tags:['Chat','Vision','2M Context'],lat:'~0.7s',ctx:'2M',rpm:'360',type:['chat','vision']},
+  {id:'llama-3.1-405b',name:'Llama 3.1 405B',provider:'Meta',icon:'🦙',color:'#0668E1',price:'₹20/1M in',desc:'World\'s best open-source model. Near GPT-4 quality at a fraction of cost.',tags:['Chat','Code','Open Source'],lat:'~0.6s',ctx:'128K',rpm:'50K',type:['chat','code']},
+  {id:'dall-e-3',name:'DALL-E 3',provider:'OpenAI',icon:'🎨',color:'#AB68FF',price:'₹400/image',desc:'State-of-the-art image generation from detailed text descriptions.',tags:['Image Gen','HD','1792×1024'],lat:'~8s',ctx:'—',rpm:'15',type:['image']},
+  {id:'text-embedding-3-large',name:'text-embedding-3-large',provider:'OpenAI',icon:'📐',color:'#00A3BF',price:'₹1/1M in',desc:'Best-in-class embeddings for semantic search and RAG systems.',tags:['Embeddings','RAG','3072-dim'],lat:'~0.2s',ctx:'8K',rpm:'100K',type:['embedding']},
+  {id:'mixtral-8x22b',name:'Mixtral 8x22B',provider:'Mistral',icon:'🌀',color:'#F74B00',price:'₹10/1M in',desc:'MoE architecture. Excellent multilingual support including Hindi, Tamil.',tags:['Chat','Code','Multilingual'],lat:'~0.5s',ctx:'64K',rpm:'60K',type:['chat','code']},
+  {id:'gemini-1.5-flash',name:'Gemini 1.5 Flash',provider:'Google',icon:'⚡',color:'#4285F4',price:'₹8/1M in',desc:'Ultra-fast Gemini with 1M context at minimal cost.',tags:['Chat','Vision','1M Context'],lat:'~0.3s',ctx:'1M',rpm:'1K',type:['chat','vision']},
+  {id:'whisper-v3',name:'Whisper v3',provider:'OpenAI',icon:'🎤',color:'#0B93F6',price:'₹50/min',desc:'Industry-leading speech-to-text. Hindi, English and 99 languages.',tags:['Speech','Hindi','100 Languages'],lat:'~2s',ctx:'—',rpm:'500',type:['chat']},
+];
+
+const PLANS = [
+  {name:'Starter',price:'99',tokens:'100,000',color:'var(--text2)',features:['All 50+ AI Models','100K Tokens','1 API Key','Basic Analytics','Email Support']},
+  {name:'Developer',price:'499',tokens:'600,000',color:'var(--blue)',pop:true,features:['All 50+ AI Models','600K Tokens','5 API Keys','Advanced Analytics','Priority Support','Rate Limit Boost']},
+  {name:'Pro',price:'999',tokens:'1,500,000',color:'var(--purple)',features:['All 50+ AI Models','1.5M Tokens','20 API Keys','Full Analytics','Batch API','Custom Rate Limits','24/7 Support']},
+  {name:'Enterprise',price:'2499',tokens:'5,000,000',color:'var(--amber)',features:['All 50+ AI Models','5M Tokens','Unlimited Keys','White Label','SLA 99.99%','Invoice Billing','Dedicated Manager']},
+];
+
+const PRICE_TABLE = [
+  {model:'GPT-4o',input:'₹120',output:'₹360'},
+  {model:'Claude 3.5 Sonnet',input:'₹100',output:'₹500'},
+  {model:'Gemini 1.5 Pro',input:'₹80',output:'₹240'},
+  {model:'Llama 3.1 405B',input:'₹20',output:'₹20'},
+  {model:'GPT-4o Mini',input:'₹15',output:'₹60'},
+  {model:'Mixtral 8x22B',input:'₹10',output:'₹30'},
+  {model:'Gemini 1.5 Flash',input:'₹8',output:'₹24'},
+  {model:'GPT-3.5 Turbo',input:'₹5',output:'₹15'},
+];
+
+// ─── TICKER ──────────────────────────────────
+(function renderTicker(){
+  const items = [
+    {label:'GPT-4o',price:'₹120/1M',cls:'tb-blue'},{label:'Claude 3.5',price:'₹100/1M',cls:'tb-amber'},
+    {label:'Gemini Pro',price:'₹80/1M',cls:'tb-blue'},{label:'Llama 3.1',price:'₹20/1M',cls:'tb-green'},
+    {label:'Mixtral',price:'₹10/1M',cls:'tb-purple'},{label:'DALL-E 3',price:'₹400/img',cls:'tb-purple'},
+    {label:'Whisper',price:'₹50/min',cls:'tb-blue'},{label:'Embeddings',price:'₹1/1M',cls:'tb-green'},
+    {label:'Gemini Flash',price:'₹8/1M',cls:'tb-blue'},{label:'GPT-4o Mini',price:'₹15/1M',cls:'tb-amber'},
+  ];
+  const html = [...items,...items].map(i =>
+    `<div class="tick"><span>${i.label}</span><span class="tick-badge ${i.cls}">${i.price}</span></div>`).join('');
+  document.getElementById('ticker').innerHTML = html;
+})();
+
+// ─── RENDER MODELS ───────────────────────────
+let activeFilter = 'all';
+function renderModels(){
+  const grid = document.getElementById('models-grid');
+  const list = activeFilter === 'all' ? MODELS : MODELS.filter(m => m.type.includes(activeFilter));
+  grid.innerHTML = list.map(m => `
+    <div class="model-card">
+      <div class="mc-glow" style="background:${m.color};"></div>
+      <div class="mc-head">
+        <div class="mc-icon" style="background:${m.color}22;">${m.icon}</div>
+        <div class="mc-info">
+          <div class="mc-name">${m.name}</div>
+          <div class="mc-provider">${m.provider}</div>
+        </div>
+        <div class="mc-price">${m.price}</div>
+      </div>
+      <div class="mc-desc">${m.desc}</div>
+      <div class="mc-tags">${m.tags.map(t=>`<span class="mc-tag">${t}</span>`).join('')}</div>
+      <div class="mc-stats">
+        <div class="mcs"><div class="mcs-v">${m.lat}</div><div class="mcs-k">Latency</div></div>
+        <div class="mcs"><div class="mcs-v">${m.ctx}</div><div class="mcs-k">Context</div></div>
+        <div class="mcs"><div class="mcs-v">${m.rpm}</div><div class="mcs-k">RPM</div></div>
+      </div>
+      <div class="mc-foot">
+        <a href="#docs" class="btn btn-ghost">View Docs</a>
+        <button class="btn btn-blue" onclick="handlePurchaseClick(event)">Get API Key</button>
+      </div>
+    </div>`).join('');
+}
+function filterModels(f, btn){
+  activeFilter = f;
+  document.querySelectorAll('.mfbtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderModels();
+}
+renderModels();
+
+// ─── RENDER PLANS ────────────────────────────
+(function renderPlans(){
+  document.getElementById('plans-grid').innerHTML = PLANS.map(p => `
+    <div class="plan-card ${p.pop?'pop':''}">
+      <div class="plan-name" style="color:${p.color}">${p.name}</div>
+      <div class="plan-price">
+        <span class="cur">₹</span>${parseInt(p.price).toLocaleString('en-IN')}<span class="per"> one-time</span>
+      </div>
+      <div class="plan-tokens">≈ ${p.tokens} tokens</div>
+      <ul class="plan-feats">${p.features.map(f=>`<li>${f}</li>`).join('')}</ul>
+      <button class="btn ${p.pop?'btn-blue':'btn-ghost'} plan-btn" onclick="handlePurchaseClick(event,'${p.name}',${p.price})">
+        ${p.pop?'⚡ ':''}Pay ₹${parseInt(p.price).toLocaleString('en-IN')} via UPI
+      </button>
+    </div>`).join('');
+})();
+
+// ─── RENDER PRICE TABLE ──────────────────────
+(function renderPriceTable(){
+  document.getElementById('price-table').innerHTML = PRICE_TABLE.map((r,i) => `
+    <tr style="border-top:1px solid rgba(255,255,255,0.04);${i===0?'border-top:none;':''}">
+      <td style="padding:10px 24px;font-size:13px;font-weight:600;">${r.model}</td>
+      <td style="padding:10px 16px;font-size:13px;font-family:monospace;color:var(--green);text-align:right;">${r.input}</td>
+      <td style="padding:10px 24px;font-size:13px;font-family:monospace;color:var(--blue);text-align:right;">${r.output}</td>
+    </tr>`).join('');
+})();
+
+// ─── PURCHASE CLICK HANDLER ──────────────────
+// Called when user clicks any "Buy" / "Get API Key" button
+// If logged in → go to dashboard payment page
+// If not → open auth modal with context message
+let _pendingPlan = null;
+
+function handlePurchaseClick(e, planName='', planPrice=0) {
+  if(e) e.preventDefault();
+  _pendingPlan = {name:planName, price:planPrice};
+
+  if(Session.isLoggedIn()) {
+    // Already logged in → send to dashboard credits page
+    window.location.href = 'dashboard.html#credits';
+    return;
+  }
+
+  // Not logged in → open auth with friendly message
+  openAuth('register', 'purchase', e);
+}
+
+// ─── AUTH MODAL ──────────────────────────────
+let _authMode = 'login';
+
+function openAuth(mode='login', trigger=null, e=null) {
+  if(e) e.preventDefault();
+  _authMode = mode;
+
+  // Show/hide trigger message
+  const triggerEl = document.getElementById('am-trigger');
+  const subEl = document.getElementById('am-sub');
+
+  if(trigger === 'purchase') {
+    triggerEl.classList.add('show');
+    subEl.textContent = 'Create an account to continue';
+  } else if(trigger === 'get-started') {
+    triggerEl.classList.remove('show');
+    subEl.textContent = 'Start building with AI today';
+  } else {
+    triggerEl.classList.remove('show');
+    subEl.textContent = mode === 'login' ? 'Welcome back' : 'Create your account';
+  }
+
+  switchTab(mode);
+  document.getElementById('auth-modal').classList.add('open');
+
+  // Focus first input
+  setTimeout(() => {
+    const inp = document.querySelector(`#form-${mode} .form-inp`);
+    if(inp) inp.focus();
+  }, 280);
+}
+
+function closeAuth() {
+  document.getElementById('auth-modal').classList.remove('open');
+}
+
+function handleModalBgClick(e) {
+  if(e.target === document.getElementById('auth-modal')) closeAuth();
+}
+
+function switchTab(mode) {
+  _authMode = mode;
+  const login = mode === 'login';
+  document.getElementById('form-login').style.display = login ? '' : 'none';
+  document.getElementById('form-register').style.display = login ? 'none' : '';
+  document.getElementById('tab-login').classList.toggle('on', login);
+  document.getElementById('tab-register').classList.toggle('on', !login);
+  document.getElementById('am-sub').textContent = login ? 'Welcome back' : 'Create your account';
+}
+
+// Escape key closes modal
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeAuth(); });
+
+// ─── LOGIN ───────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const btn   = document.getElementById('login-btn');
+
+  if(!email || !pass) { toast('err','Missing fields','Enter your email and password'); return; }
+
+  setLoading(btn, true);
+
+  try {
+    const res  = await fetch(`${API_BASE}/auth/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password:pass}),
+    });
+    const data = await res.json();
+
+    if(!res.ok) {
+      const msg = data?.code === 'EMAIL_NOT_VERIFIED'
+        ? 'Please verify your email first — check your inbox'
+        : data?.error || 'Invalid email or password';
+      toast('err', 'Login failed', msg);
+      setLoading(btn, false);
+      return;
+    }
+
+    // Success
+    Session.set({token:data.token, user:data.user});
+    closeAuth();
+    updateNavForLoggedIn(data.user);
+    toast('ok', `Welcome back, ${data.user.name}! 👋`, 'You\'re now logged in');
+
+    // If user was trying to purchase, redirect to dashboard
+    if(_pendingPlan?.price > 0) {
+      setTimeout(() => window.location.href = 'dashboard.html#credits', 800);
+    }
+  } catch(err) {
+    toast('err','Network error','Cannot reach server');
+  }
+
+  setLoading(btn, false);
+}
+
+// ─── REGISTER ────────────────────────────────
+async function doRegister() {
+  const name  = document.getElementById('r-name').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const pass  = document.getElementById('r-pass').value;
+  const btn   = document.getElementById('reg-btn');
+
+  if(!name || !email || !pass) { toast('err','Missing fields','Please fill all fields'); return; }
+  if(pass.length < 8) { toast('err','Weak password','Use at least 8 characters'); return; }
+
+  setLoading(btn, true);
+
+  try {
+    const res  = await fetch(`${API_BASE}/auth/register`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name, email, password:pass}),
+    });
+    const data = await res.json();
+
+    if(!res.ok) {
+      toast('err','Registration failed', data?.error || 'Email may already be registered');
+      setLoading(btn, false);
+      return;
+    }
+
+    toast('ok','Account created! 🎉','Check your email to verify your account');
+    // Switch to login tab
+    setTimeout(() => {
+      switchTab('login');
+      document.getElementById('l-email').value = email;
+    }, 500);
+  } catch(err) {
+    toast('err','Network error','Cannot reach server');
+  }
+
+  setLoading(btn, false);
+}
+
+// ─── FORGOT PASSWORD ─────────────────────────
+async function showForgotPass(e) {
+  e.preventDefault();
+  const email = document.getElementById('l-email').value.trim();
+  if(!email) { toast('err','Enter email','Type your email in the field above first'); return; }
+
+  await fetch(`${API_BASE}/auth/forgot-password`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({email}),
+  });
+  toast('ok','Reset email sent','Check your inbox for a reset link');
+}
+
+// ─── NAV STATE ───────────────────────────────
+function updateNavForLoggedIn(user) {
+  document.getElementById('nav-auth-btns').style.display = 'none';
+  const pill = document.getElementById('user-pill');
+  pill.classList.add('show');
+  document.getElementById('pill-av').textContent = (user.name || 'U')[0].toUpperCase();
+  document.getElementById('pill-name').textContent = user.name.split(' ')[0];
+  document.getElementById('pill-credits').textContent = `₹${parseFloat(user.credits || 0).toFixed(2)}`;
+  document.getElementById('dash-btn').style.display = 'flex';
+}
+
+function updateNavForGuest() {
+  document.getElementById('nav-auth-btns').style.display = 'flex';
+  document.getElementById('user-pill').classList.remove('show');
+  document.getElementById('dash-btn').style.display = 'none';
+}
+
+function goToDashboard() { window.location.href = 'dashboard.html'; }
+
+// ─── INIT — check if already logged in ───────
+(function init() {
+  const session = Session.get();
+  if(session?.token && session?.user) {
+    updateNavForLoggedIn(session.user);
+    // Optionally verify token is still valid
+    fetch(`${API_BASE}/auth/me`, {
+      headers:{ 'Authorization': `Bearer ${session.token}` }
+    }).then(r => {
+      if(!r.ok) { Session.clear(); updateNavForGuest(); }
+      else r.json().then(d => { if(d.user) updateNavForLoggedIn(d.user); });
+    }).catch(() => {}); // Fail silently — user stays logged in on page
+  }
+})();
+
+// ─── HELPERS ─────────────────────────────────
+function setLoading(btn, on) {
+  if(!btn) return;
+  if(on) {
+    btn._orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spin"></div>';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = btn._orig || 'Submit';
+  }
+}
+
+function toast(type, title, sub) {
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  const icon = type==='ok'?'✅':type==='err'?'❌':'ℹ️';
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span class="toast-ico">${icon}</span><div><div class="toast-title">${title}</div><div class="toast-sub">${sub||''}</div></div>`;
+  wrap.appendChild(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 400); }, 4200);
+}
+</script>
+</body>
+</html>
